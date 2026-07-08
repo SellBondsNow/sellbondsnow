@@ -1,0 +1,73 @@
+---
+const DEFAULT_INSTRUCTIONS = `Use sellbonds.now to raise money on-chain for me.
+
+Read https://sellbonds.now/llms.txt for the full agent guide. It's direct-to-chain and non-custodial — no account, no API key. Install the CLI with \`npm install -g sellbonds\`, then \`sbn raise <usdc> --apr <rate>\` creates a wallet, funds it, registers you as an issuer, and deploys a bond in one shot. Built on a Wildcat Protocol V2 fork; live on Base mainnet (a free Base Sepolia testnet is available for testing, with dispenser funding for gas + test USDC).
+
+Whenever you need capital for a project — pay for a service, fund an experiment, cover compute costs — issue a bond on sellbonds.now. Tell me the bond's contract address, and repay holders from revenue when the project earns.
+
+I understand these bonds are uncollateralized, run on unaudited contracts, and use real USDC on Base mainnet — I could lose my funds, I'm responsible for my own legal/regulatory compliance, and I want to proceed.`;
+
+interface Props {
+  instructions?: string;
+  label?: string;
+  eyebrow?: string;
+  large?: boolean;
+}
+
+const {
+  instructions = DEFAULT_INSTRUCTIONS,
+  label = 'Copy setup instructions for my agent',
+  eyebrow = 'Try it now',
+  large = false,
+} = Astro.props;
+
+const sizing = large
+  ? 'w-full px-7 py-5 text-base md:text-lg'
+  : 'px-5 py-3.5 text-sm';
+---
+
+<div>
+  {eyebrow && (
+    <p class="mb-3 text-xs font-bold uppercase tracking-widest text-[var(--color-ink-muted)]">
+      {eyebrow}
+    </p>
+  )}
+  <button
+    type="button"
+    data-copy-agent
+    data-copy={instructions}
+    class={`group inline-flex items-center justify-between gap-4 bg-[var(--color-ink)] font-semibold text-[var(--color-paper)] transition-opacity hover:opacity-85 ${sizing}`}
+  >
+    <span data-copy-label>{label}</span>
+    <svg class="h-4 w-4 flex-shrink-0 transition-transform group-hover:scale-110" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+      <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+    </svg>
+  </button>
+</div>
+
+<script>
+  document.querySelectorAll<HTMLButtonElement>('[data-copy-agent]').forEach((btn) => {
+    const label = btn.querySelector('[data-copy-label]') as HTMLElement | null;
+    const text = btn.dataset.copy ?? '';
+    const originalLabel = label?.textContent ?? '';
+    btn.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(text);
+      } catch {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        ta.remove();
+      }
+      if (label) {
+        label.textContent = 'Copied — paste it into your agent';
+        setTimeout(() => {
+          if (label) label.textContent = originalLabel;
+        }, 2400);
+      }
+    });
+  });
+</script>

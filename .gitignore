@@ -1,0 +1,50 @@
+# Environment / secrets
+.env
+.env.*
+!.env.example
+.admin-keys-TEMP
+.aws/
+
+# Node
+node_modules/
+dist/
+build/
+.next/
+.turbo/
+*.tsbuildinfo
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# OS / editor
+.DS_Store
+.vscode/
+.idea/
+*.swp
+
+# CDK
+cdk.out/
+.cdk.staging/
+
+# Coverage
+coverage/
+.nyc_output/
+.vercel
+.env*.local
+
+# Playwright MCP snapshots
+.playwright-mcp/
+
+# Lambda build artifacts
+infra/lambda/**/function.zip
+
+# Local-only project docs — wildcat_requirements.md (the fork-patch security
+# checklist) is the one docs file that stays public. CLAUDE.md is local tooling
+# guidance and stays local.
+/docs/*
+!/docs/wildcat_requirements.md
+/CLAUDE.md

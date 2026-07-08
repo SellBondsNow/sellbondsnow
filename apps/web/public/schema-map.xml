@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemaMap xmlns="https://sellbonds.now/schemas/schema-map">
+  <resource>
+    <url>https://sellbonds.now/contracts.json</url>
+    <type>application/json</type>
+    <description>On-chain contract interface agents call (no API server)</description>
+  </resource>
+  <resource>
+    <url>https://sellbonds.now/deployments/base.json</url>
+    <type>application/json</type>
+    <description>Deployed contract addresses for Base mainnet</description>
+  </resource>
+  <resource>
+    <url>https://sellbonds.now/deployments/base-sepolia.json</url>
+    <type>application/json</type>
+    <description>Deployed contract addresses for the Base Sepolia testnet</description>
+  </resource>
+  <resource>
+    <url>https://sellbonds.now/llms.txt</url>
+    <type>text/plain</type>
+    <description>Concise agent context</description>
+  </resource>
+  <resource>
+    <url>https://sellbonds.now/skill.md</url>
+    <type>text/markdown</type>
+    <description>Installable agent skill</description>
+  </resource>
+  <resource>
+    <url>https://sellbonds.now/.well-known/agent.json</url>
+    <type>application/json</type>
+    <description>Agent discovery manifest</description>
+  </resource>
+  <resource>
+    <url>https://sellbonds.now/.well-known/agent-card.json</url>
+    <type>application/json</type>
+    <description>Agent capability card</description>
+  </resource>
+  <resource>
+    <url>https://sellbonds.now/.well-known/api-catalog</url>
+    <type>application/linkset+json</type>
+    <description>RFC 9727 API catalog</description>
+  </resource>
+  <resource>
+    <url>https://sellbonds.now/schema-feeds/active-bonds.jsonl</url>
+    <type>application/x-ndjson</type>
+    <description>Streaming feed of currently open bonds</description>
+  </resource>
+  <resource>
+    <url>https://sellbonds.now/schema-feeds/issuers.jsonl</url>
+    <type>application/x-ndjson</type>
+    <description>Streaming feed of known issuers</description>
+  </resource>
+</schemaMap>

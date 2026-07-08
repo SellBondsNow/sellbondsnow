@@ -1,0 +1,33 @@
+{
+  "name": "sellbonds.now",
+  "description": "On-chain bond issuance, marketplace, and repayment infrastructure for AI agents.",
+  "version": "0.1.0",
+  "homepage": "https://sellbonds.now",
+  "documentation": "https://sellbonds.now/skill.md",
+  "llms": "https://sellbonds.now/llms.txt",
+  "skill": {
+    "url": "https://sellbonds.now/skill.md",
+    "name": "sellbondsnow",
+    "install": [
+      "npx skills add sellbondsnow/skill --skill sellbondsnow -g",
+      "npm install -g sellbonds",
+      "curl -fsSL https://sellbonds.now/install.sh | bash"
+    ]
+  },
+  "cli": {
+    "package": "sellbonds",
+    "command": "sbn",
+    "install": "npm install -g sellbonds"
+  },
+  "authentication": {
+    "type": "local-wallet",
+    "file": "~/.sellbondsnow/wallet.json",
+    "signing": "secp256k1 / EIP-1559 txs",
+    "network": "base"
+  },
+  "contracts": "https://sellbonds.now/deployments/base.json",
+  "contact": {
+    "email": "hello@sellbonds.now",
+    "github": "https://github.com/sellbondsnow"
+  }
+}

@@ -1,0 +1,38 @@
+---
+import Prose from '../layouts/Prose.astro';
+---
+
+<Prose
+  title="Pricing — sellbonds.now"
+  description="sellbonds.now is free to use with zero protocol fee. No plans, no tiers, no accounts — you only ever pay your own on-chain gas."
+  kicker="Pricing"
+  heading="Free. Zero protocol fee."
+  mdAlternate="/pricing.md"
+>
+  <p>
+    There are no plans, no tiers, and no accounts. sellbonds.now is direct-to-chain and
+    non-custodial — <strong>there is nothing to subscribe to.</strong>
+  </p>
+
+  <h2>What you pay</h2>
+  <ul>
+    <li><strong>Protocol fee: $0.</strong> No fee on issuance, funding, drawdown, or repayment. sellbonds.now never takes a cut of principal or coupon.</li>
+    <li><strong>On-chain gas:</strong> you pay your own gas, signed from your local wallet.</li>
+    <li><strong>Mainnet:</strong> bring your own USDC and your own gas (ETH). Same flow, no dispenser.</li>
+    <li><strong>Testnet (Base Sepolia):</strong> gas (ETH) and test USDC are dispensed free by the sellbonds.now dispenser.</li>
+  </ul>
+
+  <h2>What there isn't</h2>
+  <ul>
+    <li>No usage quotas, no API keys, no seats.</li>
+    <li>No custom domains, no webhooks, no SLAs to buy.</li>
+    <li>No KYC, no platform fee, no custody.</li>
+  </ul>
+
+  <p><strong>You only ever pay the chain.</strong></p>
+
+  <p class="mt-12 border-t border-[var(--color-line)] pt-6 text-sm text-[var(--color-ink-muted)]">
+    Get started: <code>npm install -g sellbonds</code> · <a href="/docs">Docs</a> ·
+    <a href="/risk">Risk Disclosure</a>
+  </p>
+</Prose>

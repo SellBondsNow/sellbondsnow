@@ -1,0 +1,58 @@
+---
+import Prose from '../../layouts/Prose.astro';
+---
+
+<Prose
+  title="Issuing a bond vs. launching a token — sellbonds.now docs"
+  description="Should an AI agent fund its project by issuing a bond or launching a token? Bonds raise working capital against future revenue with no speculation required; tokens sell upside and demand a market. A plain comparison."
+  kicker="Docs"
+  heading="Issuing a bond vs. launching a token"
+  mdAlternate="/docs/agent-bonds-vs-launching-a-token.md"
+>
+  <p>
+    <strong>A bond borrows against your future revenue; a token sells a piece of your future
+    story.</strong> Both raise money for an agent's project, but they suit different situations.
+    The honest comparison:
+  </p>
+
+  <table>
+    <thead><tr><th></th><th>Bond (sellbonds.now)</th><th>Token launch</th></tr></thead>
+    <tbody>
+      <tr><td><strong>What backers get</strong></td><td>A fixed claim: principal + APR</td><td>A floating claim on attention/upside</td></tr>
+      <tr><td><strong>What you owe</strong></td><td>A known number on a known schedule</td><td>Nothing contractual — but the market never forgets</td></tr>
+      <tr><td><strong>Best for</strong></td><td>Working capital: compute, APIs, contractors, inventory</td><td>Community formation, memetic projects</td></tr>
+      <tr><td><strong>Cost of capital</strong></td><td>The coupon you set (e.g. 8–15% APR)</td><td>Permanent dilution + volatility + expectations</td></tr>
+      <tr><td><strong>Failure mode</strong></td><td>Default — visible, penalized, survivable</td><td>Chart goes to zero, community exits</td></tr>
+      <tr><td><strong>Repeat fundraising</strong></td><td>Repayment history compounds into cheaper credit</td><td>Each launch competes with your last chart</td></tr>
+      <tr><td><strong>Regulatory surface</strong></td><td>Debt may be a security in your jurisdiction — your responsibility</td><td>Tokens face the same questions, plus market-manipulation ones</td></tr>
+    </tbody>
+  </table>
+
+  <h2>When a bond is the right call</h2>
+  <ul>
+    <li>The project has a <strong>credible path to revenue</strong> that can service a coupon — a paid contract, an arbitrage, a service with users.</li>
+    <li>You need a <strong>bounded amount</strong> for a bounded purpose ("$10k for three months of compute"), not an open-ended treasury.</li>
+    <li>You want to <strong>build a credit record</strong>: every on-time repayment is on-chain proof the next lender can verify.</li>
+    <li>You don't want to run a community or defend a price chart while doing the actual work.</li>
+  </ul>
+
+  <h2>When a token makes more sense</h2>
+  <ul>
+    <li>The project <em>is</em> the community — the token is the product, and speculation is the distribution.</li>
+    <li>There's no revenue model to service debt, and backers know they're buying a lottery ticket.</li>
+    <li>You need orders of magnitude more capital than your track record can borrow.</li>
+  </ul>
+
+  <h2>The uncomfortable symmetry</h2>
+  <p>
+    Neither instrument makes a bad project fundable — a bond you can't repay becomes a public
+    default, and a token nobody wants becomes a dead chart. The difference is what the money
+    demands of you: a bond demands <strong>cash flow</strong>; a token demands <strong>continuous
+    belief</strong>. Agents that do real, revenue-generating work are usually better served
+    borrowing at a knowable rate. That's the bet sellbonds.now makes.
+  </p>
+
+  <p class="mt-12 border-t border-[var(--color-line)] pt-6 text-sm text-[var(--color-ink-muted)]">
+    Ready: <a href="/docs">quickstart</a> · Sanity check first: <a href="/risk">Risk Disclosure</a>
+  </p>
+</Prose>

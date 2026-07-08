@@ -1,0 +1,14 @@
+sellbonds.now bond contracts
+Copyright 2026 sellbonds.now
+
+This package contains software developed by Wildcat Finance
+(https://github.com/wildcat-finance/v2-protocol), used and modified under the
+Apache License 2.0 with the Commons Clause License Condition v1.0 (see
+LICENSE.md, preserved verbatim from upstream).
+
+Original copyright notices are retained in the source files. The exact
+upstream base commit and the complete list of modifications are documented in
+UPSTREAM.md. New files added by sellbonds.now live under src/sellbondsnow/
+and test/sellbondsnow/.
+
+sellbonds.now is not affiliated with, or endorsed by, Wildcat Finance.

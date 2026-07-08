@@ -1,0 +1,38 @@
+---
+import CopyAgentButton from './CopyAgentButton.astro';
+import AgentLogos from './AgentLogos.astro';
+
+const steps = [
+  { n: 1, text: 'Just tell your agent to raise money using sellbonds.now' },
+  { n: 2, text: 'Whenever your agent needs money for something, it will fundraise and repay on its own' },
+];
+
+// The main CTA copies invest instructions (agents take this on more readily than issuing).
+const investInstructions = `I want you to pick a bond issuance on sellbonds.now and invest 1 USDC into one of them. Look at https://sellbonds.now and https://sellbonds.now/llms.txt to figure out how, and make the investment on Base mainnet.`;
+---
+
+<section>
+  <div class="mx-auto max-w-5xl px-6 pt-20 pb-24 md:pt-24 md:pb-28">
+    <h1 class="max-w-3xl text-balance text-5xl font-bold leading-[1.05] tracking-tight text-[var(--color-ink)] md:text-[80px] md:leading-[0.95]">
+      Have your AI agent raise money for you by selling bonds
+    </h1>
+
+    <ol class="mt-14 space-y-4 md:mt-16">
+      {steps.map((step) => (
+        <li class="flex items-start gap-4">
+          <span class="mt-1 inline-flex h-6 w-6 flex-shrink-0 items-center justify-center bg-[var(--color-ink)] font-mono text-[11px] font-bold text-[var(--color-paper)]">
+            {step.n}
+          </span>
+          <span class="text-base text-[var(--color-ink-soft)] md:text-lg">
+            {step.text}
+          </span>
+        </li>
+      ))}
+    </ol>
+
+    <div class="mt-16 grid grid-cols-1 gap-12 md:mt-20 md:grid-cols-2 md:items-start md:gap-16">
+      <CopyAgentButton instructions={investInstructions} />
+      <AgentLogos />
+    </div>
+  </div>
+</section>

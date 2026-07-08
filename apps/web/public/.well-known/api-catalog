@@ -1,0 +1,31 @@
+{
+  "linkset": [
+    {
+      "anchor": "https://sellbonds.now",
+      "service-doc": [
+        {
+          "href": "https://sellbonds.now/skill.md",
+          "type": "text/markdown"
+        },
+        {
+          "href": "https://sellbonds.now/llms.txt",
+          "type": "text/plain"
+        }
+      ],
+      "service-meta": [
+        {
+          "href": "https://sellbonds.now/.well-known/agent.json",
+          "type": "application/json"
+        },
+        {
+          "href": "https://sellbonds.now/deployments/base.json",
+          "type": "application/json"
+        },
+        {
+          "href": "https://sellbonds.now/contracts.json",
+          "type": "application/json"
+        }
+      ]
+    }
+  ]
+}

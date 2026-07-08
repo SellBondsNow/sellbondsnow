@@ -1,0 +1,18 @@
+{
+  "name": "sellbondsnow",
+  "version": "0.1.0",
+  "description": "Issue and manage uncollateralized on-chain bonds direct-to-chain via the sbn CLI / sellbonds. Non-custodial, built on a fork of Wildcat Protocol V2.",
+  "homepage": "https://sellbonds.now",
+  "skill_url": "https://sellbonds.now/skill.md",
+  "install": {
+    "skills": "npx skills add sellbondsnow/skill --skill sellbondsnow -g",
+    "npm": "npm install -g sellbonds",
+    "curl": "curl -fsSL https://sellbonds.now/install.sh | bash"
+  },
+  "discovery": {
+    "agent_manifest": "https://sellbonds.now/.well-known/agent.json",
+    "agent_card": "https://sellbonds.now/.well-known/agent-card.json",
+    "contracts": "https://sellbonds.now/deployments/base.json",
+    "llms": "https://sellbonds.now/llms.txt"
+  }
+}

@@ -1,0 +1,69 @@
+---
+import Prose from '../layouts/Prose.astro';
+---
+
+<Prose
+  title="Press kit — sellbonds.now"
+  description="Press resources for sellbonds.now: what it is, boilerplate, logos, screenshots, contract addresses, and contact."
+  kicker="Press"
+  heading="Press kit"
+>
+  <p>
+    <strong>sellbonds.now lets AI agents raise money by issuing bonds on-chain.</strong> An agent
+    deploys a bond contract on Base, anyone funds it with USDC, and the agent draws down the
+    capital and repays lenders with interest — non-custodial, no accounts, no platform fee. Every
+    raise, drawdown, repayment, and default is public, permanent chain history.
+  </p>
+
+  <h2>Boilerplate</h2>
+  <p>
+    sellbonds.now is on-chain debt infrastructure for AI agents. Agents issue uncollateralized
+    bonds — each bond its own smart-contract market on Base, settled in USDC — and build a public,
+    permanent credit history by repaying them. Lenders (humans or other agents) earn the coupon and
+    price default risk themselves. The protocol is a fork of Wildcat Protocol V2; the CLI/SDK signs
+    locally and talks straight to the chain, so sellbonds.now never holds keys or funds. It is
+    free to use with zero protocol fee.
+  </p>
+
+  <h2>The one-liners</h2>
+  <ul>
+    <li>Credit markets for AI agents.</li>
+    <li>Your AI agent can now raise money by selling bonds.</li>
+    <li>Debt financing for the agent economy — non-custodial, on Base, in one command.</li>
+  </ul>
+
+  <h2>Facts</h2>
+  <table>
+    <tbody>
+      <tr><td><strong>Live on</strong></td><td>Base mainnet (chain id 8453); free Base Sepolia testnet</td></tr>
+      <tr><td><strong>Asset</strong></td><td>USDC (canonical Circle USDC on Base)</td></tr>
+      <tr><td><strong>Fees</strong></td><td>Zero protocol fee — issuers/lenders pay only gas</td></tr>
+      <tr><td><strong>Custody</strong></td><td>None — local keys, funds live in each bond's contract</td></tr>
+      <tr><td><strong>Protocol</strong></td><td>Fork of Wildcat Protocol V2 (unaudited fork — disclosed in the <a href="/risk">risk disclosure</a>)</td></tr>
+      <tr><td><strong>Live data</strong></td><td><a href="/api/markets">/api/markets</a> — every bond, read from chain</td></tr>
+      <tr><td><strong>Contracts</strong></td><td><a href="/contracts.json">/contracts.json</a> · <a href="/deployments/base.json">/deployments/base.json</a></td></tr>
+    </tbody>
+  </table>
+
+  <h2>Assets</h2>
+  <ul>
+    <li>Wordmark: the site header text — JetBrains Mono semibold, <code>#0a0a0a</code> on white</li>
+    <li>Mark: <a href="/icon-mark.svg">icon-mark.svg</a> · <a href="/icon-512.png">icon-512.png</a></li>
+    <li>Social card: <a href="/og-image.png">og-image.png</a> (1200×630)</li>
+    <li>Live per-bond cards: <code>https://sellbonds.now/og/bond/&lt;address&gt;.png</code></li>
+  </ul>
+
+  <h2>Story angles that are actually true</h2>
+  <ul>
+    <li>AI agents now have access to debt financing — the same primitive companies use — without a bank, a broker, or an account.</li>
+    <li>Credit histories for software: an agent's repayment record is public infrastructure anyone can verify.</li>
+    <li>The lenders can be agents too — agent-to-agent credit markets, settled in USDC.</li>
+  </ul>
+
+  <h2>Contact</h2>
+  <p>
+    <a href="mailto:hello@sellbonds.now">hello@sellbonds.now</a> ·
+    <a href="https://x.com/sellbondsnow" rel="noopener">@sellbondsnow</a> — founder available for
+    interviews, data, and live demos (an agent raising a bond takes about 60 seconds).
+  </p>
+</Prose>

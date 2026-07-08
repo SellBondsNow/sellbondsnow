@@ -1,0 +1,137 @@
+---
+import '../styles/global.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+  /**
+   * Path to an OG image relative to the site root. If omitted, the
+   * default 1200×630 social card at /og-image.png is used.
+   */
+  ogImage?: string;
+}
+
+const SITE_NAME = 'sellbonds.now';
+const DEFAULT_TITLE = 'Have your AI agent raise money for you by selling bonds — sellbonds.now';
+const DEFAULT_DESCRIPTION =
+  'Issue, sell, and repay on-chain bonds from any AI agent. Whenever your agent needs capital, it fundraises and repays on its own.';
+
+const {
+  title = DEFAULT_TITLE,
+  description = DEFAULT_DESCRIPTION,
+  ogImage = '/og-image.png',
+} = Astro.props;
+
+const canonical = new URL(Astro.url.pathname, Astro.site).toString();
+const ogImageUrl = new URL(ogImage, Astro.site).toString();
+
+// Entity + product structured data (homepage only). `sameAs` consolidates the
+// sellbonds.now entity across search engines and LLMs — keep in sync with the
+// real profiles as they go live (X now; GitHub org + npm at launch).
+const isHome = Astro.url.pathname === '/';
+const homeJsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    '@id': 'https://sellbonds.now/#org',
+    name: SITE_NAME,
+    url: 'https://sellbonds.now/',
+    logo: 'https://sellbonds.now/icon-512.png',
+    description: DEFAULT_DESCRIPTION,
+    sameAs: [
+      'https://x.com/sellbondsnow',
+      'https://github.com/sellbondsnow/sellbondsnow',
+      'https://www.npmjs.com/package/sellbonds',
+    ],
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    '@id': 'https://sellbonds.now/#website',
+    name: SITE_NAME,
+    url: 'https://sellbonds.now/',
+    publisher: { '@id': 'https://sellbonds.now/#org' },
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'SoftwareApplication',
+    name: 'sellbonds (sbn CLI)',
+    operatingSystem: 'macOS, Linux, Windows',
+    applicationCategory: 'FinanceApplication',
+    description:
+      'CLI/SDK that lets any AI agent issue, fund, and repay uncollateralized on-chain bonds in USDC on Base — non-custodial, no account, no platform fee.',
+    url: 'https://sellbonds.now/',
+    installUrl: 'https://sellbonds.now/install.sh',
+    license: 'https://www.apache.org/licenses/LICENSE-2.0',
+    offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+    publisher: { '@id': 'https://sellbonds.now/#org' },
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'SoftwareSourceCode',
+    name: 'sellbonds.now monorepo',
+    codeRepository: 'https://github.com/sellbondsnow/sellbondsnow',
+    license: 'https://www.apache.org/licenses/LICENSE-2.0',
+    programmingLanguage: ['TypeScript', 'Solidity'],
+    author: { '@id': 'https://sellbonds.now/#org' },
+  },
+];
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="generator" content={Astro.generator} />
+    <meta name="theme-color" content="#0a0a0a" />
+    <meta name="color-scheme" content="light dark" />
+
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+
+    {/* Favicons */}
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="mask-icon" href="/icon-mark.svg" color="#0a0a0a" />
+    <link rel="manifest" href="/site.webmanifest" />
+
+    {/* Open Graph */}
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={SITE_NAME} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImageUrl} />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="sellbonds.now — Have your AI agent raise money for you by selling bonds" />
+    <meta property="og:locale" content="en_US" />
+
+    {/* Twitter / X */}
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="@sellbondsnow" />
+    <meta name="twitter:creator" content="@sellbondsnow" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImageUrl} />
+    <meta name="twitter:image:alt" content="sellbonds.now — Have your AI agent raise money for you by selling bonds" />
+
+    {/* iMessage / Slack / Discord all read OG and Twitter tags above */}
+
+    {/* Agent surfaces */}
+    <link rel="alternate" type="text/plain" href="/llms.txt" title="llms.txt — agent context" />
+    <link rel="alternate" type="text/markdown" href="/index.md" title="Markdown version" />
+
+    {/* Structured data (homepage) */}
+    {isHome && <script type="application/ld+json" set:html={JSON.stringify(homeJsonLd)} />}
+  </head>
+  <body class="min-h-screen bg-paper text-ink antialiased">
+    <slot />
+  </body>
+</html>

@@ -1,0 +1,101 @@
+---
+import Prose from '../../layouts/Prose.astro';
+
+const faqs = [
+  {
+    q: 'What happens if the issuer doesn\'t repay an on-chain bond?',
+    a: 'The bond goes delinquent: a penalty APR accrues on top of the coupon, and the default is permanently visible in the issuer\'s on-chain history. There is no collateral to seize — lenders price default risk before funding, and issuers repay to protect the track record that lets them borrow again.',
+  },
+  {
+    q: 'Can I sell a bond before it matures?',
+    a: 'Yes. Lenders hold a freely-transferable ERC-20 bond token, so a position can be transferred or sold peer-to-peer at any time; interest accrues to whoever holds the token.',
+  },
+  {
+    q: 'Are on-chain bonds securities?',
+    a: 'They may be, depending on your jurisdiction and the facts of the offering. The protocol performs no KYC and makes no legal determination — issuers and lenders are responsible for their own compliance.',
+  },
+];
+const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({
+    '@type': 'Question',
+    name: f.q,
+    acceptedAnswer: { '@type': 'Answer', text: f.a },
+  })),
+};
+---
+
+<Prose
+  title="How do uncollateralized on-chain bonds work? — sellbonds.now docs"
+  description="An uncollateralized on-chain bond is a smart-contract market: lenders deposit USDC and receive interest-accruing tokens, the issuer draws down and repays, and the whole credit history lives on-chain."
+  kicker="Docs"
+  heading="How do uncollateralized on-chain bonds work?"
+  mdAlternate="/docs/how-do-onchain-bonds-work.md"
+>
+  <p>
+    <strong>An on-chain bond is a loan encoded as a smart contract.</strong> On sellbonds.now, each
+    bond is its own market contract on Base holding one asset (USDC). The issuer fixes the terms at
+    deploy time — how much it wants to raise (the cap), the interest rate (APR), open-ended or
+    fixed maturity. Lenders deposit USDC and receive an ERC-20 <em>bond token</em> that accrues
+    interest block by block. Everything — terms, balances, draws, repayments, defaults — is public
+    chain state.
+  </p>
+
+  <h2>Uncollateralized means reputation-backed</h2>
+  <p>
+    Traditional DeFi lending is over-collateralized: you lock $150 to borrow $100. That's useless
+    for raising <em>working capital</em> — if you had the collateral, you wouldn't need the loan.
+    sellbonds.now bonds (built on the
+    <a href="https://github.com/wildcat-finance/v2-protocol" rel="noopener">Wildcat V2</a> market
+    design) are <strong>uncollateralized</strong>: repayment depends on the issuer, and the
+    issuer's permanent, public repayment history is the collateral. Good borrowers get cheaper
+    credit over time; defaulters carry the mark forever.
+  </p>
+
+  <h2>The moving parts</h2>
+  <table>
+    <thead><tr><th>Piece</th><th>Role</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Market contract</strong></td><td>One per bond. Holds USDC, mints bond tokens, enforces terms.</td></tr>
+      <tr><td><strong>Cap / raised</strong></td><td>Maximum size of the bond vs. what lenders have deposited so far.</td></tr>
+      <tr><td><strong>APR (coupon)</strong></td><td>Interest that accrues to bond-token holders continuously.</td></tr>
+      <tr><td><strong>Reserve ratio</strong></td><td>Share of raised funds the issuer must leave in the market as withdrawal liquidity.</td></tr>
+      <tr><td><strong>Penalty APR</strong></td><td>Extra rate that accrues while the issuer is delinquent on reserves.</td></tr>
+      <tr><td><strong>Bond token</strong></td><td>Transferable ERC-20 the lender holds; redeemable via withdrawal batches.</td></tr>
+    </tbody>
+  </table>
+
+  <h2>A worked example</h2>
+  <p>
+    An agent deploys a $10,000 cap bond at 8.5% APR with a 20% reserve. Lenders fill it: the
+    market holds $10,000 and lenders hold 10,000 interest-accruing bond tokens. The agent draws
+    down up to $8,000 (cap minus reserve) to spend. Over the term it repays into the market;
+    holders' tokens grow at 8.5% annualized. When the agent closes the bond, remaining principal +
+    interest is available and lenders redeem. If instead it had stopped paying, the market would
+    have flagged delinquency, accrued the penalty APR, and written the default into the agent's
+    permanent record.
+  </p>
+
+  <h2>What's genuinely different from a bank bond</h2>
+  <ul>
+    <li><strong>Settlement is the ledger:</strong> no custodian, no transfer agent — the contract is the registrar and paying agent.</li>
+    <li><strong>Credit history is public infrastructure:</strong> anyone (or any agent) can read an issuer's full record before lending.</li>
+    <li><strong>No intermediaries also means no safety net:</strong> no deposit insurance, no underwriter, no recourse. See the <a href="/risk">Risk Disclosure</a>.</li>
+  </ul>
+
+  <h2>FAQ</h2>
+  {faqs.map((f) => (
+    <>
+      <h3>{f.q}</h3>
+      <p>{f.a}</p>
+    </>
+  ))}
+
+  <p class="mt-12 border-t border-[var(--color-line)] pt-6 text-sm text-[var(--color-ink-muted)]">
+    Next: <a href="/docs/how-can-an-ai-agent-raise-money">How can an AI agent raise money?</a> ·
+    <a href="/docs">All docs</a>
+  </p>
+</Prose>
+
+<script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />

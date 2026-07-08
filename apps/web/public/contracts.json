@@ -1,0 +1,117 @@
+{
+  "network": "base",
+  "chainId": 8453,
+  "explorer": "https://basescan.org",
+  "addresses": "https://sellbonds.now/deployments/base.json",
+  "testnet": {
+    "network": "base-sepolia",
+    "chainId": 84532,
+    "explorer": "https://sepolia.basescan.org",
+    "addresses": "https://sellbonds.now/deployments/base-sepolia.json",
+    "note": "Free Base Sepolia testnet. Target it with `sbn --network base-sepolia` (or SBN_NETWORK=base-sepolia); gas + test USDC are dispensed automatically."
+  },
+  "protocol": "Wildcat V2 fork (uncollateralized credit markets)",
+  "source": {
+    "repo": "https://github.com/sellbondsnow/sellbondsnow",
+    "contractsLicense": "Apache-2.0 WITH Commons-Clause (source-available; upstream Wildcat license preserved)",
+    "monorepoLicense": "Apache-2.0",
+    "upstream": "https://github.com/wildcat-finance/v2-protocol @ 2624204522e5e13817ecad3655411bb9fc35ab11",
+    "forkDelta": "https://github.com/sellbondsnow/sellbondsnow/blob/main/packages/contracts/UPSTREAM.md",
+    "verifyEverything": "https://sellbonds.now/verify.md",
+    "verifyContractSource": "https://sourcify.dev/server/v2/contract/8453/<address>",
+    "verifiedSourceUi": "https://base.blockscout.com/address/<address>?tab=contract"
+  },
+  "description": "Direct-to-chain, non-custodial. There is no API server. Agents act through a local CLI/SDK (sellbonds, command `sbn`, viem-based) that signs locally and calls these contracts directly. Each bond is its own market contract holding USDC; the issuer sets the coupon (APR) and terms at deploy time and lenders receive a freely-transferable bond token.",
+  "sdk": {
+    "package": "sellbonds",
+    "command": "sbn",
+    "install": "npm install -g sellbonds",
+    "note": "The SDK wraps every function below. Agents normally call `sbn` commands rather than these raw functions."
+  },
+  "contracts": {
+    "WildcatArchController": {
+      "role": "Registry of approved issuers (borrowers), markets, and hooks templates. Issuers register here before deploying a bond.",
+      "address": "see addresses URL"
+    },
+    "HooksFactory": {
+      "role": "Deploys new bond markets and their hooks instance from a hooks template. Entry point for issuing a bond.",
+      "address": "see addresses URL"
+    },
+    "OpenTermHooksTemplate": {
+      "role": "Hooks template for open-term bonds (no fixed maturity; lenders can queue withdrawals on a rolling basis).",
+      "address": "see addresses URL"
+    },
+    "FixedTermHooksTemplate": {
+      "role": "Hooks template for fixed-term bonds (principal locked until a set maturity).",
+      "address": "see addresses URL"
+    },
+    "WildcatSanctionsSentinel": {
+      "role": "Sanctions guard used by markets to block sanctioned addresses; queries the configured oracle.",
+      "address": "see addresses URL"
+    },
+    "NullSanctionsOracle": {
+      "role": "No-op sanctions oracle used on testnet (always returns not-sanctioned).",
+      "address": "see addresses URL"
+    },
+    "TestUSDC": {
+      "role": "The bond currency. On Base mainnet this is canonical Circle USDC (0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913); on the Base Sepolia testnet it is a freely-mintable MockUSDC topped up via `sbn fund`.",
+      "address": "see addresses URL"
+    },
+    "Market": {
+      "role": "One deployed per bond. Holds the USDC, tracks the transferable bond token, accrues interest, and handles deposits, draws, repayments, and withdrawals.",
+      "address": "deployed per bond; discover via the factory / addresses URL"
+    }
+  },
+  "functions": [
+    {
+      "signature": "registerSelf()",
+      "target": "WildcatArchController",
+      "description": "Register the calling wallet as an approved issuer so it can deploy bond markets."
+    },
+    {
+      "signature": "deployMarketAndHooks(address hooksTemplate, bytes hooksTemplateArgs, (address asset,string namePrefix,string symbolPrefix,uint128 maxTotalSupply,uint16 annualInterestBips,uint16 delinquencyFeeBips,uint32 withdrawalBatchDuration,uint16 reserveRatioBips,uint32 delinquencyGracePeriod,uint256 hooks) parameters, bytes hooksData, bytes32 salt, address originationFeeAsset, uint256 originationFeeAmount) returns (address market, address hooksInstance)",
+      "target": "HooksFactory",
+      "description": "Deploy a new bond market plus its hooks instance from a template, setting the asset, coupon (annualInterestBips), cap (maxTotalSupply), reserve ratio, and grace/penalty terms."
+    },
+    {
+      "signature": "deposit(uint256 amount)",
+      "target": "Market",
+      "description": "Lend into a bond: deposit USDC and receive an equal amount of the transferable bond token."
+    },
+    {
+      "signature": "depositUpTo(uint256 amount) returns (uint256 actualAmount)",
+      "target": "Market",
+      "description": "Deposit up to amount, automatically capped at the market's remaining capacity; returns the amount actually deposited."
+    },
+    {
+      "signature": "borrow(uint256 amount)",
+      "target": "Market",
+      "description": "Issuer draws down available (above-reserve) USDC from the bond market."
+    },
+    {
+      "signature": "repay(uint256 amount)",
+      "target": "Market",
+      "description": "Issuer repays principal plus accrued interest back into the bond market."
+    },
+    {
+      "signature": "queueWithdrawal(uint256 amount) returns (uint32 expiry)",
+      "target": "Market",
+      "description": "Lender queues a redemption of bond tokens into a withdrawal batch; returns the batch expiry timestamp."
+    },
+    {
+      "signature": "executeWithdrawal(address account, uint32 expiry)",
+      "target": "Market",
+      "description": "After a withdrawal batch's expiry, transfer the lender's matured USDC out to their account."
+    },
+    {
+      "signature": "closeMarket()",
+      "target": "Market",
+      "description": "Issuer (or backup closer) settles outstanding obligations and closes the bond."
+    },
+    {
+      "signature": "setBackupCloser(address closer)",
+      "target": "Market",
+      "description": "Authorize a backup address that can close the market if the issuer becomes unavailable."
+    }
+  ]
+}

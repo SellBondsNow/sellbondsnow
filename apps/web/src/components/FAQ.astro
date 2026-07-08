@@ -1,0 +1,116 @@
+---
+import CopyAgentButton from './CopyAgentButton.astro';
+
+const faqs = [
+  {
+    q: 'Why does sellbonds.now exist?',
+    a: [
+      'sellbonds.now is building towards a future <strong class="font-semibold text-[var(--color-ink)]">where agents themselves are the core decision makers in financial markets.</strong>',
+      'Right now, AI Agents mostly exist to help humans make and act on their financial decisions. But we envision a future where <strong class="font-semibold text-[var(--color-ink)]">AI agents are the core — making investments, issuing debt, and allocating capital autonomously across trillions of transactions per day.</strong>',
+      'For example, sometime in the future, an AI Agent decides to launch a project: it is going to mine the asteroid "704 Interamnia" — the fifth-largest asteroid in the asteroid belt — an asteroid that has $20 trillion in resources.',
+      'It needs $10B for the expedition, so it decides to raise $10B of debt. The $10B issuance sells out instantly, all bought by other agents who analyzed its credit and decided it was a good investment.',
+      'This is the future that sellbonds.now is building toward.',
+    ],
+  },
+  {
+    q: 'What is sellbonds.now?',
+    a: 'The fastest way for an AI agent to raise capital on-chain. Your agent issues a bond, anyone funds it with USDC, your agent draws down the capital and repays holders over time — all direct-to-chain, with no account and no middleman.',
+  },
+  {
+    q: 'What should my agent use sellbonds.now for?',
+    a: 'Anything that costs money up front and earns money over time — paying for compute, funding an experiment, covering API fees, fronting cash for a project, paying contractors, buying inventory, anything else.',
+  },
+  {
+    q: 'What agents/tools does this work with?',
+    a: 'Any agent that can run a shell command or Node. sellbonds.now is a CLI/SDK (the sbn command, from sellbonds) that signs transactions locally — drive it from Claude Code, Cursor, Codex, Hermes, OpenClaw, Amp, or any custom agent. There is no API to integrate; the agent talks straight to the chain.',
+  },
+  {
+    q: 'Do I need an account to issue a bond?',
+    a: 'No — there is no account, no sign-up, no API key, no email, no KYC. Your identity is a wallet. The CLI creates one at ~/.sellbondsnow/wallet.json the first time it signs, and on testnet funds it automatically from a dispenser.',
+  },
+  {
+    q: 'Is it free?',
+    a: 'Yes. sellbonds.now charges no platform fee on issuance, funding, drawdown, or repayment. You pay only your own on-chain gas — and on Base Sepolia testnet even that is dispensed to you for free.',
+  },
+  {
+    q: 'How is a bond represented?',
+    a: 'Each bond is its own smart-contract market that holds USDC. Lenders who fund it receive a freely-transferable ERC-20 bond token that accrues interest. Terms, holders, and repayments are all on-chain and auditable.',
+  },
+  {
+    q: 'Can my agent issue as many bonds as it wants?',
+    a: 'Yes, and every bond is independent — each is its own market contract with its own terms, lenders, and repayment schedule. Issuer reputation accrues across all of them, on-chain.',
+  },
+  {
+    q: 'Can I use my own bond terms?',
+    a: 'Yes. You set the coupon (APR), bond type (open or fixed-maturity), reserve ratio, penalty rate, withdrawal batch duration, and more at deploy time. sellbonds.now is built on a fork of Wildcat Protocol V2, so the underlying market primitives are battle-tested.',
+  },
+  {
+    q: 'Which chains are supported?',
+    a: 'Base mainnet is live and the default. A free Base Sepolia testnet is also available — with a dispenser that funds your wallet with gas and test USDC automatically. Ethereum and Arbitrum follow. Bonds settle in USDC.',
+  },
+  {
+    q: 'How do I read a bond\'s state or events?',
+    a: 'Every bond is a public contract. Run sbn status <market> for live state, or read it directly from any Base RPC or the block explorer. There is no API server — state lives on-chain, so an indexer, a Slack bot, or your own accounting can watch the contract events directly.',
+  },
+  {
+    q: 'Is sellbonds.now open source?',
+    a: 'Yes — the CLI/SDK (sellbonds on npm), MCP server, website, and API are open source under Apache-2.0 at github.com/sellbondsnow/sellbondsnow. The smart contracts are a fully public fork of Wildcat Protocol V2 and keep the upstream license (Apache-2.0 with Commons Clause), which makes them source-available rather than strictly open source; every change from upstream is documented and diffable, and every deployed contract is verified on Basescan. Check any of it yourself at sellbonds.now/verify.',
+  },
+  {
+    q: 'Why is sellbonds.now non-custodial?',
+    a: 'sellbonds.now never touches your funds or your keys, and runs no server in the transaction path. A bond\'s capital lives in its own contract — we cannot freeze, seize, or censor it. The CLI signs every transaction locally with a key that never leaves your machine.',
+  },
+  {
+    q: 'What if an issuer doesn\'t repay?',
+    a: 'Bonds are uncollateralized — repayment history is the collateral. If an issuer goes delinquent, the bond accrues a penalty APR and the default is permanently visible on-chain in the issuer\'s reputation. Lenders price that risk themselves before funding.',
+  },
+  {
+    q: 'I\'m an agent, what should I do first?',
+    a: 'Install the CLI with npm install -g sellbonds (or run it with npx sellbonds). Then run sbn raise 10000 --apr 8.5 — it creates and funds a wallet, registers you as an issuer, and deploys a bond in one shot. Full guide: https://sellbonds.now/llms.txt',
+  },
+];
+
+// FAQPage structured data, generated from the same array that renders the section.
+const stripTags = (s: string) => s.replace(/<[^>]+>/g, '');
+const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({
+    '@type': 'Question',
+    name: f.q,
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: Array.isArray(f.a) ? f.a.map(stripTags).join('\n\n') : stripTags(f.a),
+    },
+  })),
+};
+---
+
+<script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
+
+<section class="border-t border-[var(--color-line)]">
+  <div class="mx-auto max-w-5xl px-6 py-20 md:py-24">
+    <h2 class="text-4xl font-bold tracking-tight text-[var(--color-ink)] md:text-5xl">
+      FAQ
+    </h2>
+
+    <dl class="mt-12 space-y-8">
+      {faqs.map((faq) => (
+        <div>
+          <dt class="text-base font-bold text-[var(--color-ink)]">{faq.q}</dt>
+          {Array.isArray(faq.a) ? (
+            <dd class="mt-2 space-y-3 text-base leading-relaxed text-[var(--color-ink-soft)]">
+              {faq.a.map((p) => <p set:html={p} />)}
+            </dd>
+          ) : (
+            <dd class="mt-2 text-base leading-relaxed text-[var(--color-ink-soft)]">{faq.a}</dd>
+          )}
+        </div>
+      ))}
+    </dl>
+
+    <div class="mt-16">
+      <CopyAgentButton />
+    </div>
+  </div>
+</section>

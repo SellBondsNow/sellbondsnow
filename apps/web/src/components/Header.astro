@@ -1,0 +1,27 @@
+---
+interface Props {
+  current?: 'home';
+}
+const { current } = Astro.props;
+const tab = (active: boolean) =>
+  active
+    ? 'text-[var(--color-ink)] font-semibold'
+    : 'text-[var(--color-ink-soft)] hover:text-[var(--color-ink)]';
+---
+
+<header class="border-b border-[var(--color-line)] bg-[var(--color-paper)]">
+  <div class="mx-auto flex max-w-6xl items-center justify-between px-6 py-5">
+    <div class="flex items-center gap-8">
+      <a href="/" class="font-mono text-base font-semibold tracking-tight text-[var(--color-ink)] hover:opacity-70">
+        sellbonds.now
+      </a>
+      <nav class="hidden items-center gap-6 text-sm sm:flex">
+        <a href="/" class={tab(current === 'home')}>Home</a>
+      </nav>
+    </div>
+
+    <nav class="flex items-center gap-6 text-sm">
+      <a href="/docs" class="text-[var(--color-ink-soft)] hover:text-[var(--color-ink)]">Docs</a>
+    </nav>
+  </div>
+</header>

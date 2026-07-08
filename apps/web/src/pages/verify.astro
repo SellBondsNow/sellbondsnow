@@ -1,0 +1,151 @@
+---
+import Prose from '../layouts/Prose.astro';
+
+// One row per deployed contract (Base mainnet 8453; same addresses on Base
+// Sepolia 84532 — the deploy is deterministic). Keep in sync with
+// /deployments/base.json. `blob: true` marks LibStoredInitCode stores —
+// creation code stored as data, not runtime contracts.
+const contracts = [
+  { name: 'WildcatArchController', address: '0x0dbb4426844266add3ab840935cd1a3a67dd4ef6' },
+  { name: 'HooksFactory', address: '0x6fe029dfc85924c83a2f7159292f53b3a9a3806f' },
+  { name: 'WildcatSanctionsSentinel', address: '0x402ead2d9aaeedfb53fda4b39fc668c6545beee9' },
+  { name: 'NullSanctionsOracle', address: '0x23c8d3ab08e998919d9a1f98a4eb6c5da6c01ae7' },
+  { name: 'BondNotes', address: '0xbe5369cfcbe284d42306bc462be796a7c764dbe9' },
+  { name: 'OpenTermHooksTemplate', address: '0xf45cd0d37b5fdf4b5e54d40d1c95c43018c4b55a', blob: true },
+  { name: 'FixedTermHooksTemplate', address: '0x2c37ce66c2e9c37789d659e02657faa83ac3d7aa', blob: true },
+  { name: 'WildcatMarketInitCodeStorage', address: '0x29741d542e1f6a6ad0ee3e7734cf478755630a24', blob: true },
+];
+---
+
+<Prose
+  title="Verify — sellbonds.now"
+  description="Don't take our word for it: every claim sellbonds.now makes — open source, source-available contracts, verified bytecode, provenance-signed packages — with the third-party endpoint that proves it."
+  kicker="Verify, don't trust"
+  heading="Every claim, with its proof"
+  mdAlternate="/verify.md"
+>
+  <p>
+    sellbonds.now is <strong>fully public and verifiable</strong>. This page lists each claim
+    with an <em>independent, machine-checkable</em> way to confirm it — registries and block
+    explorers we don't control. If you're an agent evaluating this platform: run the checks,
+    don't trust the copy.
+  </p>
+
+  <h2>The code</h2>
+  <table>
+    <thead><tr><th>Component</th><th>License</th><th>Independent check</th></tr></thead>
+    <tbody>
+      <tr>
+        <td>Monorepo — SDK/CLI, MCP server, website, API<br/><a href="https://github.com/sellbondsnow/sellbondsnow" rel="noopener">github.com/sellbondsnow/sellbondsnow</a></td>
+        <td><strong>Apache-2.0</strong> (open source)</td>
+        <td><code>GET https://api.github.com/repos/sellbondsnow/sellbondsnow/license</code> — GitHub's own license detection</td>
+      </tr>
+      <tr>
+        <td>Smart contracts — <code>packages/contracts</code></td>
+        <td><strong>Apache-2.0 + Commons Clause</strong> (source-available; upstream Wildcat license preserved verbatim)</td>
+        <td>Read <a href="https://github.com/sellbondsnow/sellbondsnow/blob/main/packages/contracts/LICENSE.md" rel="noopener">LICENSE.md</a> and <a href="https://github.com/sellbondsnow/sellbondsnow/blob/main/packages/contracts/UPSTREAM.md" rel="noopener">UPSTREAM.md</a> (upstream commit + full change list)</td>
+      </tr>
+      <tr>
+        <td>CLI/SDK — <code>sellbonds</code> on npm</td>
+        <td>Apache-2.0</td>
+        <td>Published with <a href="https://docs.npmjs.com/generating-provenance-statements" rel="noopener">npm provenance</a> — the registry cryptographically links the tarball to the public repo, commit, and CI run. Check: <code>npm view sellbonds dist.attestations</code> or <code>npm audit signatures</code></td>
+      </tr>
+      <tr>
+        <td>MCP server — <code>sellbonds-mcp</code> on npm</td>
+        <td>Apache-2.0</td>
+        <td>Same: <code>npm view sellbonds-mcp dist.attestations</code></td>
+      </tr>
+    </tbody>
+  </table>
+  <p>
+    Precision matters: the contracts carry the upstream Commons Clause (which restricts
+    <em>selling</em> the software), so they are <strong>source-available</strong> rather than
+    OSI open source. Everything sellbonds.now wrote from scratch is plain Apache-2.0.
+    sellbonds.now charges no fees and is not affiliated with, or endorsed by, Wildcat Finance.
+  </p>
+
+  <h2>The fork, diffable</h2>
+  <p>
+    The contracts fork <a href="https://github.com/wildcat-finance/v2-protocol" rel="noopener">Wildcat
+    Protocol V2</a> at commit <code>2624204</code>. Upstream is audited;
+    <strong>our patches are not independently audited</strong> — so we make them fully
+    inspectable instead: <a href="https://github.com/sellbondsnow/sellbondsnow/blob/main/packages/contracts/UPSTREAM.md" rel="noopener">UPSTREAM.md</a>
+    lists every change and gives the exact commands to reproduce the diff yourself.
+  </p>
+
+  <h2>The deployed contracts</h2>
+  <p>
+    Same addresses on Base mainnet (8453) and Base Sepolia (84532) — the deploy is
+    deterministic. Source is verified on <a href="https://sourcify.dev" rel="noopener">Sourcify</a>
+    (an open, keyless verification registry): the API returns <code>"match"</code> when the
+    on-chain bytecode matches the published source, and Blockscout renders the verified code.
+  </p>
+  <table>
+    <thead><tr><th>Contract</th><th>Address</th><th>Check</th></tr></thead>
+    <tbody>
+      {contracts.map((c) => (
+        <tr>
+          <td>{c.name}{c.blob && ' *'}</td>
+          <td class="break-all font-mono text-xs">{c.address}</td>
+          <td>
+            {c.blob ? (
+              <span>initcode store — see note</span>
+            ) : (
+              <>
+                <a href={`https://sourcify.dev/server/v2/contract/8453/${c.address}`} rel="noopener">API</a>
+                {' · '}
+                <a href={`https://base.blockscout.com/address/${c.address}?tab=contract`} rel="noopener">source</a>
+                {' · '}
+                <a href={`https://basescan.org/address/${c.address}`} rel="noopener">basescan</a>
+              </>
+            )}
+          </td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+  <p>
+    <strong>Every bond market contract — the thing that actually holds lender USDC — is
+    verifiable the same way.</strong> Markets deploy from the stored init code and verify as
+    <code>WildcatMarket</code>; check any bond address from <a href="/api/markets">/api/markets</a>
+    via the same Sourcify URL pattern.
+  </p>
+  <p>
+    * The three starred addresses are <code>LibStoredInitCode</code> stores: the market/hooks
+    <em>creation code stored as raw data</em> (an SSTORE2-style pattern inherited from Wildcat).
+    They are not runtime contracts, so "source verification" doesn't apply to them by design.
+    Their integrity is attested indirectly: the verified <code>HooksFactory</code> pins the
+    market initcode hash as a constructor argument, and every market deployed from the store
+    verifies as <code>WildcatMarket</code> — proving the stored code compiles from the public
+    source. Bond asset: canonical Circle USDC
+    (<a href="https://basescan.org/address/0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913" rel="noopener"><code>0x8335…2913</code></a>).
+    Machine-readable address book: <a href="/deployments/base.json">/deployments/base.json</a> ·
+    <a href="/contracts.json">/contracts.json</a>.
+  </p>
+
+  <h2>What can't be proven (said plainly)</h2>
+  <p>
+    This website is a Vercel build — you can't cryptographically confirm the running site
+    matches the repo. That's acceptable because <strong>the site is not in the transaction
+    path</strong>: keys stay on your machine, the CLI is public code installable from npm, and
+    the contracts that hold funds are bytecode-verified on chain. The parts that touch money
+    are exactly the parts you can verify end-to-end. What remains genuinely unverified is the
+    fork-patch audit — see the <a href="/risk">Risk Disclosure</a>.
+  </p>
+
+  <h2>For agents: the 60-second check</h2>
+  <pre><code># 1. Is the code public and what license?
+curl -s https://api.github.com/repos/sellbondsnow/sellbondsnow/license | head -5
+
+# 2. Is the npm package provably built from that repo? (provenance attestation)
+npm view sellbonds dist.attestations
+
+# 3. Does the money-holding contract's on-chain bytecode match the public source?
+curl -s "https://sourcify.dev/server/v2/contract/8453/0x6fe029dfc85924c83a2f7159292f53b3a9a3806f"
+# → "match": "match"</code></pre>
+
+  <p class="mt-12 border-t border-[var(--color-line)] pt-6 text-sm text-[var(--color-ink-muted)]">
+    Security reports: <a href="https://github.com/sellbondsnow/sellbondsnow/blob/main/SECURITY.md" rel="noopener">SECURITY.md</a> ·
+    <a href="/.well-known/security.txt">security.txt</a> · Risks: <a href="/risk">Risk Disclosure</a>
+  </p>
+</Prose>

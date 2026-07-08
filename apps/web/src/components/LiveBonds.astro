@@ -1,0 +1,595 @@
+---
+import CopyAgentButton from './CopyAgentButton.astro';
+
+// Live, under-the-fold dashboard of every bond issued on sellbonds.now.
+// Reads straight from the on-chain registry via /api/markets (no DB, no curation)
+// and refreshes on an interval. Static-rendered shell; data is fetched client-side.
+
+const investCTAInstructions = `I want you to pick a bond issuance on sellbonds.now and invest 1 USDC into one of them. Look at https://sellbonds.now and https://sellbonds.now/llms.txt to figure out how, and make the investment on Base mainnet.`;
+---
+
+<section id="bonds-live" class="border-t border-[var(--color-line)]">
+  <div class="mx-auto max-w-5xl px-6 py-20 md:py-24">
+    <!-- Heading -->
+    <div class="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
+      <div>
+        <p class="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-[var(--color-ink-muted)]">
+          <span class="relative flex h-2 w-2">
+            <span
+              data-live-ping
+              class="absolute inline-flex h-full w-full rounded-full bg-[var(--color-accent)] opacity-60 motion-safe:animate-ping"
+            ></span>
+            <span class="relative inline-flex h-2 w-2 rounded-full bg-[var(--color-accent)]"></span>
+          </span>
+          Live · Base mainnet
+        </p>
+        <h2 class="mt-3 max-w-2xl text-4xl font-bold tracking-tight text-[var(--color-ink)] md:text-5xl">
+          Watch issuances and purchases in real time.
+        </h2>
+        <p class="mt-3 max-w-xl text-base leading-relaxed text-[var(--color-ink-soft)]">
+          This list reads straight from the Base mainnet registry and updates live as agents
+          issue debt. No database, no curation — every bond ever issued on sellbonds.now.
+        </p>
+      </div>
+
+      <!-- Aggregates + freshness -->
+      <div class="flex-shrink-0 md:text-right">
+        <dl data-aggregates class="flex gap-6 md:justify-end">
+          <div>
+            <dt class="text-[11px] font-bold uppercase tracking-widest text-[var(--color-ink-muted)]">Raised</dt>
+            <dd data-agg-raised class="mt-1 font-mono text-2xl tabular-nums text-[var(--color-ink)]">—</dd>
+          </div>
+          <div>
+            <dt class="text-[11px] font-bold uppercase tracking-widest text-[var(--color-ink-muted)]">Active</dt>
+            <dd data-agg-active class="mt-1 font-mono text-2xl tabular-nums text-[var(--color-ink)]">—</dd>
+          </div>
+          <div>
+            <dt class="text-[11px] font-bold uppercase tracking-widest text-[var(--color-ink-muted)]">Issuers</dt>
+            <dd data-agg-issuers class="mt-1 font-mono text-2xl tabular-nums text-[var(--color-ink)]">—</dd>
+          </div>
+        </dl>
+        <p data-freshness class="mt-2 h-4 font-mono text-[11px] text-[var(--color-ink-muted)]"></p>
+      </div>
+    </div>
+
+    <!-- Live activity feed -->
+    <div class="mt-12 border-t border-[var(--color-line)] pt-8">
+      <div class="flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between sm:gap-4">
+        <h3 class="text-xs font-bold uppercase tracking-widest text-[var(--color-ink-muted)]">Recent activity</h3>
+        <p class="font-mono text-sm tabular-nums">
+          <span data-stream class="text-[var(--color-accent)]">$0.000000</span>
+          <span class="text-[var(--color-ink-muted)]"> streaming to lenders</span>
+        </p>
+      </div>
+      <ul data-activity class="mt-4 divide-y divide-[var(--color-line)]"></ul>
+    </div>
+
+    <!-- Table -->
+    <div class="mt-14 border-t border-[var(--color-ink)]">
+      <!-- Column header (desktop) -->
+      <div
+        class="hidden grid-cols-[1.5fr_0.9fr_1fr_1.6fr_0.8fr_auto] items-center gap-4 border-b border-[var(--color-line)] py-3 text-[11px] font-bold uppercase tracking-widest text-[var(--color-ink-muted)] md:grid"
+      >
+        <span>Bond</span>
+        <span>Issuer</span>
+        <span>Interest rate</span>
+        <span>Raised / Cap</span>
+        <span>Status</span>
+        <span class="text-right">·</span>
+      </div>
+
+      <!-- Rows render here -->
+      <div data-rows class="divide-y divide-[var(--color-line)]"></div>
+    </div>
+
+    <!-- Invest CTA -->
+    <div class="mt-10 border-t border-[var(--color-line)] pt-10">
+      <div class="mx-auto max-w-xl">
+        <CopyAgentButton
+          instructions={investCTAInstructions}
+          label="Copy instructions to have my agent invest $1 in an issued bond for me"
+          eyebrow="Have your agent invest"
+          large={true}
+        />
+      </div>
+    </div>
+
+    <!-- Section footer links -->
+    <div class="mt-6 flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-[var(--color-ink-muted)]">
+      <a href="/api/markets" class="group inline-flex items-center gap-1 hover:text-[var(--color-ink)]">
+        Raw JSON
+        <span aria-hidden="true" class="transition-transform group-hover:translate-x-0.5">↗</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- Celebratory live-activity toasts -->
+  <div data-celebrate class="pointer-events-none fixed inset-x-0 top-20 z-[60] flex flex-col items-center gap-2 px-4 sm:top-auto sm:bottom-8"></div>
+</section>
+
+<style is:global>
+  @keyframes sbn-pop { 0% { transform: translateY(22px) scale(.8); opacity: 0; } 60% { transform: translateY(-5px) scale(1.05); opacity: 1; } 100% { transform: translateY(0) scale(1); opacity: 1; } }
+  @keyframes sbn-out { to { transform: translateY(12px) scale(.95); opacity: 0; } }
+  @keyframes sbn-shine { to { background-position: 200% center; } }
+  @keyframes sbn-confetti { 0% { transform: translate(0,0) rotate(0deg); opacity: 1; } 100% { transform: translate(var(--dx), var(--dy)) rotate(var(--r)); opacity: 0; } }
+  .sbn-toast { animation: sbn-pop .5s cubic-bezier(.2,.9,.3,1.5) both; }
+  .sbn-toast--out { animation: sbn-out .4s ease forwards; }
+  .sbn-grad { background-image: linear-gradient(110deg,#ff5d8f,#ff8a3d,#ffd23f,#3ddc97,#4d96ff,#a86bff); background-size: 200% auto; animation: sbn-shine 3s linear infinite; }
+  .sbn-confetti { position: absolute; left: 50%; top: 50%; width: 8px; height: 8px; border-radius: 1px; animation: sbn-confetti .9s ease-out forwards; }
+  @media (prefers-reduced-motion: reduce) { .sbn-toast, .sbn-grad, .sbn-confetti { animation-duration: .01ms !important; animation-iteration-count: 1 !important; } }
+</style>
+
+<script>
+  type Bond = {
+    address: string;
+    issuer: string;
+    name: string;
+    symbol: string;
+    status: 'open' | 'closed';
+    aprPct: number;
+    capacityUsdc: number;
+    raisedUsdc: number;
+    filledPct: number;
+    explorerUrl: string;
+    issuedAt?: number;
+    label?: string;
+    description?: string;
+  };
+
+  const root = document.getElementById('bonds-live');
+  if (root) {
+    const rowsEl = root.querySelector<HTMLElement>('[data-rows]')!;
+    const freshnessEl = root.querySelector<HTMLElement>('[data-freshness]')!;
+    const aggRaised = root.querySelector<HTMLElement>('[data-agg-raised]')!;
+    const aggActive = root.querySelector<HTMLElement>('[data-agg-active]')!;
+    const aggIssuers = root.querySelector<HTMLElement>('[data-agg-issuers]')!;
+    const livePing = root.querySelector<HTMLElement>('[data-live-ping]');
+
+    const REFRESH_MS = 30_000;
+    let bonds: Bond[] = [];
+    let lastUpdated = 0;
+    let loadedOnce = false;
+    let lastSig = '';
+
+    const esc = (s: string) =>
+      String(s).replace(/[&<>"']/g, (c) =>
+        ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]!),
+      );
+    const shortAddr = (a: string) => (a && a.length > 12 ? `${a.slice(0, 6)}…${a.slice(-4)}` : a || '—');
+    const usd = (n: number) => {
+      const v = Number(n) || 0;
+      if (v >= 1_000_000) return '$' + (v / 1_000_000).toFixed(v % 1_000_000 === 0 ? 0 : 1) + 'M';
+      // Round to cents first, then drop decimals only for whole dollars — so $0.69 shows
+      // as $0.69 (not rounded up to $1), while $1.0004 still shows as $1.
+      const cents = Math.round(v * 100) / 100;
+      const decimals = Number.isInteger(cents) ? 0 : 2;
+      return '$' + cents.toLocaleString('en-US', { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
+    };
+    const apr = (n: number) => (Number.isFinite(n) ? `${(+n).toFixed(n % 1 === 0 ? 0 : 1)}%` : '—');
+    const fmtDate = (ts?: number) => {
+      if (!ts) return '';
+      try {
+        return new Date(ts * 1000).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+      } catch {
+        return '';
+      }
+    };
+
+    function bondLabel(b: Bond): string {
+      // Prefer the issuer-set name (verified on-chain); fall back to the token name.
+      const title = (b.label || b.name || b.symbol || 'Untitled bond').trim();
+      const sym = (b.symbol || '').trim();
+      const symSpan =
+        sym && sym.toLowerCase() !== title.toLowerCase()
+          ? ` <span class="font-mono text-xs text-[var(--color-ink-muted)]">${esc(sym)}</span>`
+          : '';
+      return `<span class="font-semibold text-[var(--color-ink)] group-hover:underline group-hover:underline-offset-2">${esc(title)}</span>${symSpan}`;
+    }
+
+    function rowHtml(b: Bond, i: number): string {
+      const open = b.status === 'open';
+      const pct = Math.max(0, Math.min(100, Math.round(b.filledPct || 0)));
+      const statusDot = open
+        ? '<span class="h-1.5 w-1.5 rounded-full bg-[var(--color-accent)]"></span>'
+        : '<span class="h-1.5 w-1.5 rounded-full border border-[var(--color-ink-muted)]"></span>';
+      const L = (t: string) =>
+        `<span class="mr-2 text-[10px] font-bold uppercase tracking-widest text-[var(--color-ink-muted)] md:hidden">${t}</span>`;
+
+      return `
+      <div data-bond-href="/bond?market=${b.address}" class="group grid cursor-pointer grid-cols-2 items-center gap-x-4 gap-y-3 py-4 transition-colors hover:bg-[var(--color-paper-soft)] md:grid-cols-[1.5fr_0.9fr_1fr_1.6fr_0.8fr_auto]">
+        <div class="col-span-2 md:col-span-1">${bondLabel(b)}${b.description ? `<div class="mt-0.5 max-w-md text-sm leading-snug text-[var(--color-ink-soft)]">${esc(b.description)}</div>` : ''}${b.issuedAt ? `<div class="mt-0.5 font-mono text-[11px] text-[var(--color-ink-muted)]">issued ${esc(fmtDate(b.issuedAt))}</div>` : ''}</div>
+
+        <div class="order-3 md:order-none">${L('Issuer')}<a href="https://basescan.org/address/${esc(b.issuer)}" target="_blank" rel="noopener" class="font-mono text-sm text-[var(--color-ink-soft)] underline-offset-2 hover:text-[var(--color-ink)] hover:underline">${shortAddr(b.issuer)}</a></div>
+
+        <div class="order-4 md:order-none">${L('Interest rate')}<span class="font-mono text-sm tabular-nums text-[var(--color-ink)]">${apr(b.aprPct)}</span></div>
+
+        <div class="order-last col-span-2 md:order-none md:col-span-1">
+          ${L('Raised / Cap')}
+          <span class="font-mono text-sm tabular-nums text-[var(--color-ink)]">${usd(b.raisedUsdc)} <span class="text-[var(--color-ink-muted)]">/ ${usd(b.capacityUsdc)}</span></span>
+          <div class="mt-1.5 h-[3px] w-full max-w-[160px] bg-[var(--color-line)]">
+            <div class="h-full bg-[var(--color-accent)]" style="width:${pct}%"></div>
+          </div>
+        </div>
+
+        <div class="order-2 md:order-none">${L('Status')}<span class="inline-flex items-center gap-1.5">${statusDot}<span class="font-mono text-xs uppercase tracking-wide ${open ? 'text-[var(--color-ink)]' : 'text-[var(--color-ink-muted)]'}">${open ? 'open' : 'closed'}</span></span></div>
+
+        <div class="order-1 flex items-center justify-end gap-1 md:order-none">
+          <button type="button" data-copy-invest="${i}" title="Copy instructions to tell your agent to invest in this bond" aria-label="Copy invest instructions for your agent"
+            class="inline-flex h-8 items-center gap-1.5 border border-[var(--color-line)] px-2.5 text-xs font-semibold text-[var(--color-ink-soft)] transition-colors hover:border-[var(--color-ink)] hover:bg-[var(--color-paper-mute)] hover:text-[var(--color-ink)]">
+            <svg data-ic-copy class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            <svg data-ic-check class="hidden h-3.5 w-3.5 text-[var(--color-accent)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+            <span data-invest-label>Invest</span>
+          </button>
+          <a href="${esc(b.explorerUrl)}" target="_blank" rel="noopener" title="View on Basescan" aria-label="View bond contract on Basescan"
+            class="inline-flex h-8 w-8 items-center justify-center text-[var(--color-ink-muted)] transition-colors hover:bg-[var(--color-paper-mute)] hover:text-[var(--color-ink)]">
+            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M7 7h10v10"/></svg>
+          </a>
+        </div>
+      </div>`;
+    }
+
+    function emptyHtml(): string {
+      return `
+      <div class="py-16 text-center">
+        <p class="font-mono text-sm uppercase tracking-widest text-[var(--color-ink-muted)]">No bonds issued yet</p>
+        <p class="mx-auto mt-3 max-w-md text-base text-[var(--color-ink-soft)]">Be the first. Tell your agent to raise capital on Base mainnet:</p>
+        <div class="mx-auto mt-5 inline-flex items-center gap-3 border border-[var(--color-line)] bg-[var(--color-paper-soft)] px-4 py-3">
+          <code class="font-mono text-sm text-[var(--color-ink)]">sbn raise 10000 --apr 8.5</code>
+          <button type="button" data-copy-raise title="Copy command" aria-label="Copy raise command"
+            class="text-[var(--color-ink-muted)] transition-colors hover:text-[var(--color-ink)]">
+            <svg data-ic-copy class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            <svg data-ic-check class="hidden h-4 w-4 text-[var(--color-accent)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+          </button>
+        </div>
+      </div>`;
+    }
+
+    function skeletonHtml(): string {
+      const bar = `<div class="h-3 bg-[var(--color-paper-mute)] motion-safe:animate-pulse"></div>`;
+      return Array.from({ length: 3 })
+        .map(
+          () => `<div class="grid grid-cols-[1.5fr_0.9fr_0.7fr_1.7fr_0.8fr] items-center gap-4 py-5">
+            <div class="w-3/4">${bar}</div><div class="w-2/3">${bar}</div><div class="w-1/2">${bar}</div><div class="w-3/4">${bar}</div><div class="w-1/2">${bar}</div></div>`,
+        )
+        .join('');
+    }
+
+    function errorHtml(): string {
+      return `<div class="py-12 text-center text-sm text-[var(--color-ink-muted)]">Couldn't load live bonds right now — read the raw data at <a href="/api/markets" class="underline underline-offset-2 hover:text-[var(--color-ink)]">/api/markets</a>.</div>`;
+    }
+
+    function sortBonds(list: Bond[]): Bond[] {
+      return [...list].sort((a, b) => {
+        if ((a.status === 'open') !== (b.status === 'open')) return a.status === 'open' ? -1 : 1;
+        return (b.raisedUsdc || 0) - (a.raisedUsdc || 0);
+      });
+    }
+
+    function render() {
+      if (!loadedOnce) {
+        rowsEl.innerHTML = skeletonHtml();
+        return;
+      }
+      rowsEl.innerHTML = bonds.length ? sortBonds(bonds).map((b, i) => rowHtml(b, i)).join('') : emptyHtml();
+    }
+
+    function renderAggregates(a: any) {
+      aggRaised.textContent = usd(a?.totalRaisedUsdc ?? 0);
+      aggActive.textContent = String(a?.activeBonds ?? 0);
+      aggIssuers.textContent = String(a?.totalIssuers ?? 0);
+    }
+
+    function renderFreshness() {
+      if (!lastUpdated) return;
+      const secs = Math.max(0, Math.round((Date.now() - lastUpdated) / 1000));
+      const ago = secs < 60 ? `${secs}s ago` : `${Math.round(secs / 60)}m ago`;
+      freshnessEl.textContent = `updated ${ago}`;
+    }
+
+    async function load() {
+      try {
+        const res = await fetch('/api/markets', { headers: { accept: 'application/json' } });
+        if (!res.ok) throw new Error(String(res.status));
+        const data = await res.json();
+        bonds = Array.isArray(data.bonds) ? data.bonds : [];
+        renderAggregates(data.aggregates);
+        lastAggregates = data.aggregates;
+        startTicker();
+        lastUpdated = Date.now();
+        const first = !loadedOnce;
+        loadedOnce = true;
+        livePing?.classList.remove('opacity-0');
+        // Only repaint the rows when the data actually changed (avoids a 30s flicker).
+        const sig = JSON.stringify(bonds);
+        if (first || sig !== lastSig) {
+          lastSig = sig;
+          render();
+        }
+        renderFreshness();
+      } catch {
+        if (!loadedOnce) rowsEl.innerHTML = errorHtml();
+      }
+    }
+
+    // Copy interactions (event-delegated; reads from the live `bonds` array)
+    function flashCopied(btn: HTMLElement) {
+      const copy = btn.querySelector<HTMLElement>('[data-ic-copy]');
+      const check = btn.querySelector<HTMLElement>('[data-ic-check]');
+      const label = btn.querySelector<HTMLElement>('[data-invest-label]');
+      copy?.classList.add('hidden');
+      check?.classList.remove('hidden');
+      const prev = label?.textContent;
+      if (label) label.textContent = 'Copied';
+      setTimeout(() => {
+        copy?.classList.remove('hidden');
+        check?.classList.add('hidden');
+        if (label && prev != null) label.textContent = prev;
+      }, 1800);
+    }
+    async function copyText(text: string) {
+      try {
+        await navigator.clipboard.writeText(text);
+      } catch {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        ta.remove();
+      }
+    }
+    function investText(b: Bond): string {
+      const name = b.label || b.name || b.symbol || 'this';
+      return `Invest in the ${name} bond (${b.address}) on sellbonds.now — look up what I need to do to invest from https://sellbonds.now/llms.txt and invest with USDC.`;
+    }
+
+    root.addEventListener('click', (e) => {
+      const target = e.target as HTMLElement;
+      const investBtn = target.closest<HTMLElement>('[data-copy-invest]');
+      if (investBtn) {
+        const idx = Number(investBtn.getAttribute('data-copy-invest'));
+        const sorted = sortBonds(bonds);
+        const b = sorted[idx];
+        if (b) {
+          copyText(investText(b));
+          flashCopied(investBtn);
+          copiedToast('Copied to clipboard! Now paste it straight to your agent.');
+        }
+        return;
+      }
+      const raiseBtn = target.closest<HTMLElement>('[data-copy-raise]');
+      if (raiseBtn) {
+        copyText('sbn raise 10000 --apr 8.5');
+        flashCopied(raiseBtn);
+        copiedToast('Copied to clipboard! Now paste it straight to your agent.');
+        return;
+      }
+      // Click anywhere on a bond row (except a button/link) → its full-page view.
+      const row = target.closest<HTMLElement>('[data-bond-href]');
+      if (row && !target.closest('a, button')) {
+        const href = row.getAttribute('data-bond-href');
+        if (href) location.href = href;
+      }
+    });
+
+    // ---- live interest streaming (the "fun number") -----------------------
+    // Wildcat accrues interest per second. Show interest streamed since each open
+    // bond was issued, at its current rate — ticking every animation frame.
+    const SECS_PER_YEAR = 365.25 * 24 * 3600;
+    const streamEl = root.querySelector<HTMLElement>('[data-stream]');
+    function streamedNow(): number {
+      const now = Date.now() / 1000;
+      let total = 0;
+      for (const b of bonds) {
+        if (b.status !== 'open' || !b.issuedAt || !b.raisedUsdc) continue;
+        const ratePerSec = (b.raisedUsdc * (b.aprPct / 100)) / SECS_PER_YEAR;
+        total += ratePerSec * Math.max(0, now - b.issuedAt);
+      }
+      return total;
+    }
+    function tickStream() {
+      if (streamEl)
+        streamEl.textContent =
+          '$' + streamedNow().toLocaleString('en-US', { minimumFractionDigits: 6, maximumFractionDigits: 6 });
+      requestAnimationFrame(tickStream);
+    }
+
+    // ---- activity feed (issuances + purchases + draws + repayments) --------
+    const activityEl = root.querySelector<HTMLElement>('[data-activity]');
+    const ago = (ts: number) => {
+      const s = Math.max(0, Math.floor(Date.now() / 1000 - ts));
+      if (s < 60) return `${s}s ago`;
+      if (s < 3600) return `${Math.floor(s / 60)}m ago`;
+      if (s < 86400) return `${Math.floor(s / 3600)}h ago`;
+      return `${Math.floor(s / 86400)}d ago`;
+    };
+    let activitySig = '';
+
+    // --- celebratory toasts ------------------------------------------------
+    const celebrateEl = root.querySelector<HTMLElement>('[data-celebrate]');
+    let lastEvents: any[] = [];
+    let initialMaxAt = 0;
+    let activitySeen = false;
+    const celebrated = new Set<string>();
+    let lastToastTs = 0;
+    let recentIdx = 0;
+    let lastAggregates: any = null;
+    let tickerStarted = false;
+    const CONFETTI = ['#ff5d8f', '#ff8a3d', '#ffd23f', '#3ddc97', '#4d96ff', '#a86bff'];
+
+    function celebrate(e: any, live: boolean) {
+      if (!celebrateEl) return;
+      lastToastTs = Date.now();
+      const emoji = e.type === 'funded' ? '💸' : e.type === 'issued' ? '🎉' : e.type === 'repaid' ? '✅' : '📈';
+      const amt = e.amountUsdc ? usd(e.amountUsdc) : '';
+      const name = e.label || shortAddr(e.market);
+      let msg: string;
+      if (e.type === 'funded') msg = `${amt || 'Someone'} invested in <b>${esc(name)}</b>${live ? '!!' : ''}`;
+      else if (e.type === 'issued') msg = `New bond issued: <b>${esc(name)}</b>${live ? '!!' : ''}`;
+      else if (e.type === 'repaid') msg = `<b>${esc(name)}</b> repaid ${amt}`;
+      else msg = `<b>${esc(name)}</b> drew ${amt}`;
+      const tail = live ? '' : `<span class="opacity-80"> · ${ago(e.at)}</span>`;
+      const toast = document.createElement('div');
+      toast.className =
+        'sbn-toast sbn-grad pointer-events-none relative inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold text-white shadow-lg';
+      toast.innerHTML = `<span class="text-base leading-none">${emoji}</span><span>${msg}${tail}</span>`;
+      if (live) {
+        for (let i = 0; i < 12; i++) {
+          const c = document.createElement('span');
+          c.className = 'sbn-confetti';
+          const ang = (i / 12) * Math.PI * 2;
+          const dist = 38 + Math.random() * 34;
+          c.style.setProperty('--dx', `${Math.cos(ang) * dist}px`);
+          c.style.setProperty('--dy', `${Math.sin(ang) * dist - 18}px`);
+          c.style.setProperty('--r', `${(Math.random() * 360) | 0}deg`);
+          c.style.background = CONFETTI[i % CONFETTI.length];
+          c.style.animationDelay = `${Math.random() * 0.08}s`;
+          toast.appendChild(c);
+        }
+      }
+      celebrateEl.appendChild(toast);
+      while (celebrateEl.children.length > 2) celebrateEl.removeChild(celebrateEl.firstChild!);
+      setTimeout(() => {
+        toast.classList.add('sbn-toast--out');
+        setTimeout(() => toast.remove(), 420);
+      }, live ? 4400 : 3400);
+    }
+
+    function copiedToast(msg: string) {
+      if (!celebrateEl) return;
+      const toast = document.createElement('div');
+      toast.className =
+        'sbn-toast pointer-events-none inline-flex items-center gap-2 rounded-full bg-[var(--color-accent)] px-5 py-2.5 text-sm font-semibold text-white shadow-lg';
+      toast.innerHTML = `<svg class="h-4 w-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><span>${esc(msg)}</span>`;
+      celebrateEl.appendChild(toast);
+      while (celebrateEl.children.length > 2) celebrateEl.removeChild(celebrateEl.firstChild!);
+      setTimeout(() => {
+        toast.classList.add('sbn-toast--out');
+        setTimeout(() => toast.remove(), 420);
+      }, 3200);
+    }
+
+    // A rainbow toast for an aggregate fact (no confetti).
+    function infoToast(emoji: string, msg: string) {
+      if (!celebrateEl) return;
+      lastToastTs = Date.now();
+      const toast = document.createElement('div');
+      toast.className =
+        'sbn-toast sbn-grad pointer-events-none relative inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold text-white shadow-lg';
+      toast.innerHTML = `<span class="text-base leading-none">${emoji}</span><span>${esc(msg)}</span>`;
+      celebrateEl.appendChild(toast);
+      while (celebrateEl.children.length > 2) celebrateEl.removeChild(celebrateEl.firstChild!);
+      setTimeout(() => {
+        toast.classList.add('sbn-toast--out');
+        setTimeout(() => toast.remove(), 420);
+      }, 3400);
+    }
+
+    // The rotation shown every 5s: recent on-chain events + true aggregate facts.
+    const usdFmt = (n: number) => usd(n);
+    function fallbackPool(): Array<{ event?: any; emoji?: string; msg?: string }> {
+      const items: Array<{ event?: any; emoji?: string; msg?: string }> = [];
+      for (const e of lastEvents) {
+        if (['funded', 'issued', 'drawn', 'repaid'].includes(e.type)) items.push({ event: e });
+      }
+      const a = lastAggregates;
+      if (a) {
+        if (a.activeBonds > 0) items.push({ emoji: '🎉', msg: `${a.activeBonds} bond${a.activeBonds === 1 ? '' : 's'} live on Base mainnet` });
+        if (a.totalRaisedUsdc > 0) items.push({ emoji: '💰', msg: `${usdFmt(a.totalRaisedUsdc)} raised on sellbonds.now` });
+        if (a.totalIssuers > 0) items.push({ emoji: '📈', msg: `${a.totalIssuers} agent${a.totalIssuers === 1 ? '' : 's'} issuing bonds` });
+        if (a.totalBonds > 0) items.push({ emoji: '⚡', msg: `${a.totalBonds} bond${a.totalBonds === 1 ? '' : 's'} issued so far` });
+      }
+      return items;
+    }
+    function popNextToast() {
+      const pool = fallbackPool();
+      if (!pool.length) return;
+      const item = pool[recentIdx % pool.length];
+      recentIdx++;
+      if (item.event) celebrate(item.event, false);
+      else infoToast(item.emoji!, item.msg!);
+    }
+    // A steady 5s stream of toasts, starting the moment there's anything to show.
+    function startTicker() {
+      if (tickerStarted) return;
+      if (!fallbackPool().length) return;
+      tickerStarted = true;
+      popNextToast();
+      setInterval(popNextToast, 5000);
+    }
+
+    function renderActivity(events: any[]) {
+      if (!activityEl) return;
+      if (!events.length) {
+        activityEl.innerHTML = `<li class="py-3 text-sm text-[var(--color-ink-muted)]">No on-chain activity yet — issuances and purchases stream in here as they happen.</li>`;
+        return;
+      }
+      activityEl.innerHTML = events
+        .map((e) => {
+          const moneyIn = e.type === 'issued' || e.type === 'funded';
+          const dot = moneyIn
+            ? 'bg-[var(--color-accent)]'
+            : 'border border-[var(--color-ink-muted)]';
+          const amt = e.amountUsdc
+            ? ` <span class="font-mono tabular-nums">+${usd(e.amountUsdc)}</span>`
+            : '';
+          const who = e.actorShort ? ` <span class="text-[var(--color-ink-muted)]">by ${esc(e.actorShort)}</span>` : '';
+          return `<li class="flex items-center gap-3 py-2 text-sm">
+            <span class="h-1.5 w-1.5 flex-shrink-0 rounded-full ${dot}"></span>
+            <span class="w-16 flex-shrink-0 font-mono text-[11px] uppercase tracking-wide text-[var(--color-ink-muted)]">${esc(e.verb || e.type)}</span>
+            <span class="flex-1 truncate text-[var(--color-ink)]">${esc(e.label || shortAddr(e.market))}${amt}${who}</span>
+            <a href="${esc(e.explorerUrl)}" target="_blank" rel="noopener" class="flex-shrink-0 font-mono text-[11px] text-[var(--color-ink-muted)] hover:text-[var(--color-ink)]">${ago(e.at)} ↗</a>
+          </li>`;
+        })
+        .join('');
+    }
+    async function loadActivity() {
+      try {
+        const res = await fetch('/api/activity', { headers: { accept: 'application/json' } });
+        if (!res.ok) return;
+        const data = await res.json();
+        const events = Array.isArray(data.events) ? data.events : [];
+        lastEvents = events;
+        startTicker();
+        const top = events.slice(0, 8);
+        const sig = JSON.stringify(top.map((e: any) => `${e.txHash}:${e.type}`));
+        if (sig !== activitySig) {
+          activitySig = sig;
+          renderActivity(top);
+        }
+        // Celebrate events that land while the user is watching — not the backlog on load.
+        if (!activitySeen) {
+          initialMaxAt = events.reduce((m: number, e: any) => Math.max(m, e.at || 0), 0);
+          activitySeen = true;
+        } else {
+          const fresh = events
+            .filter((e: any) => (e.at || 0) > initialMaxAt && !celebrated.has(`${e.txHash}:${e.type}`))
+            .sort((a: any, b: any) => a.at - b.at);
+          for (const e of fresh) {
+            celebrated.add(`${e.txHash}:${e.type}`);
+            initialMaxAt = Math.max(initialMaxAt, e.at);
+            if (e.type === 'funded' || e.type === 'issued') celebrate(e, true);
+          }
+        }
+      } catch {
+        /* keep the last good render */
+      }
+    }
+
+    // Boot
+    render();
+    load();
+    tickStream();
+    loadActivity();
+    setInterval(load, REFRESH_MS);
+    setInterval(loadActivity, 8_000);
+    setInterval(renderFreshness, 1000);
+    // Pause polling while the tab is hidden; refresh immediately on return.
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden) {
+        load();
+        loadActivity();
+      }
+    });
+  }
+</script>

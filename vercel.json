@@ -1,0 +1,18 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "astro",
+  "buildCommand": "pnpm --filter @sbn/web build",
+  "outputDirectory": "apps/web/dist",
+  "installCommand": "pnpm install --no-frozen-lockfile",
+  "functions": {
+    "api/og-bond.ts": { "includeFiles": "api/_fonts/**" }
+  },
+  "rewrites": [
+    { "source": "/rpc", "destination": "/api/rpc" },
+    { "source": "/sitemap-bonds.xml", "destination": "/api/sitemap-bonds" },
+    { "source": "/bond/:address(0x[0-9a-fA-F]{40})", "destination": "/api/bond-page?market=:address" },
+    { "source": "/og/bond/:address(0x[0-9a-fA-F]{40}).png", "destination": "/api/og-bond?market=:address" },
+    { "source": "/schema-feeds/active-bonds.jsonl", "destination": "/api/markets?format=jsonl" },
+    { "source": "/schema-feeds/issuers.jsonl", "destination": "/api/markets?format=issuers-jsonl" }
+  ]
+}

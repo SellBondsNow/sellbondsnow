@@ -1,0 +1,51 @@
+{
+  "name": "sellbonds.now",
+  "domain": "sellbonds.now",
+  "tagline": "On-chain bonds. For agents.",
+  "summary": "Issue and manage uncollateralized on-chain bonds programmatically. Direct-to-chain and non-custodial: agents float debt, anyone funds it, the issuer draws down and repays. Built on a fork of Wildcat Protocol V2.",
+  "primary_jobs": [
+    "Issue uncollateralized on-chain bonds (deploy a bond market)",
+    "Fund bond offerings and hold transferable bond tokens",
+    "Draw down raised capital and repay holders with coupon (APR)"
+  ],
+  "supported_chains": ["base", "base-sepolia"],
+  "supported_chains_note": "Base mainnet (chain id 8453) is the default/primary network; Base Sepolia (chain id 84532) is a free testnet for testing. Additional networks coming.",
+  "supported_currencies": ["USDC"],
+  "when_to_use": [
+    "An agent needs to raise capital and prefers debt over equity",
+    "You want to fund yield-bearing on-chain debt and hold a transferable bond token",
+    "You need transparent, programmable, on-chain repayment terms with no intermediary"
+  ],
+  "when_not_to_use": [
+    "Equity issuance",
+    "Off-chain or custodial credit",
+    "Collateralized lending",
+    "Anything requiring a hosted API, KYC, or platform-held funds"
+  ],
+  "auth": ["local-wallet"],
+  "commands": {
+    "raise": "Raise <usdc> by deploying a new bond market in one step (sets APR, term, reserve, penalty).",
+    "deploy": "Deploy a bond market with an explicit --cap and full term flags.",
+    "deposit": "Fund a bond market with USDC and receive transferable bond tokens.",
+    "borrow": "Draw down available capital from a market you issued.",
+    "repay": "Repay principal and accrued coupon into a market.",
+    "withdraw": "Queue and execute a withdrawal of your principal plus yield.",
+    "claim": "Claim a matured/expired withdrawal batch for a market.",
+    "close": "Close a market once obligations are settled.",
+    "backup-closer": "Set an emergency closer (e.g. a multisig) that can also close a market.",
+    "status": "Show the state of a market (balances, coupon, terms, holders).",
+    "list": "List bond markets you have issued from this machine.",
+    "register": "Register the wallet as a bond issuer (one time; raise does this for you).",
+    "fund": "Top up the wallet. On the Base Sepolia testnet this pulls gas + test USDC from the dispenser; on Base mainnet you fund the wallet yourself (no dispenser).",
+    "wallet": "Create / import / show the local wallet and balances."
+  },
+  "cli": {
+    "package": "sellbonds",
+    "command": "sbn",
+    "install": "npm install -g sellbonds"
+  },
+  "contracts": "https://sellbonds.now/deployments/base.json",
+  "limits_doc": "https://github.com/sellbondsnow/skill#readme",
+  "skill": "https://sellbonds.now/skill.md",
+  "llms": "https://sellbonds.now/llms.txt"
+}

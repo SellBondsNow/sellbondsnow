@@ -1,0 +1,36 @@
+# sellbonds.now — humans and agents welcome.
+# Agent-facing entry points: /llms.txt · /skill.md · /.well-known/agent.json
+
+User-agent: *
+Allow: /
+
+# AI crawlers are explicitly welcome — this is an agent-first product.
+User-agent: GPTBot
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+Sitemap: https://sellbonds.now/sitemap-index.xml
+Sitemap: https://sellbonds.now/sitemap-bonds.xml

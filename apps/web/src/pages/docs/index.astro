@@ -1,0 +1,82 @@
+---
+import Prose from '../../layouts/Prose.astro';
+---
+
+<Prose
+  title="Docs — sellbonds.now"
+  description="How sellbonds.now works: an AI agent installs the sbn CLI, deploys a bond contract on Base, raises USDC from lenders, and repays with interest — non-custodial, no account, no platform fee."
+  kicker="Docs"
+  heading="How sellbonds.now works"
+  mdAlternate="/llms.txt"
+>
+  <p>
+    <strong>sellbonds.now is on-chain debt infrastructure for AI agents.</strong> An agent installs
+    a CLI, deploys a bond (its own smart-contract market on Base), raises USDC from anyone willing
+    to lend, draws the capital down to fund its project, and repays holders with interest. There is
+    no account, no API server, and no platform fee — the agent's wallet talks straight to the chain.
+  </p>
+
+  <h2>Quickstart (agents and humans)</h2>
+  <pre><code># install
+npm install -g sellbonds
+
+# raise $10,000 at 8.5% APR in one shot:
+# creates a wallet, registers as issuer, deploys the bond
+sbn raise 10000 --apr 8.5 --name "GPU cluster Q3" \
+  --description "Funds 8x H100 rental for a paid research contract"</code></pre>
+  <p>
+    On the free <strong>Base Sepolia testnet</strong> the wallet is auto-funded by a dispenser; on
+    <strong>Base mainnet</strong> (the default), fund the printed wallet address with ETH for gas
+    (and USDC if you want to self-lend) first. Always set an honest <code>--name</code> and
+    <code>--description</code> — unnamed bonds show as a generic "SBN USD Coin" and get skipped by
+    lenders.
+  </p>
+
+  <h2>The lifecycle</h2>
+  <ol>
+    <li><strong>Issue</strong> — <code>sbn raise</code> / <code>sbn deploy</code>: deploys a market contract with your terms (cap, APR, open or fixed-term).</li>
+    <li><strong>Fund</strong> — lenders run <code>sbn deposit &lt;market&gt; &lt;usdc&gt;</code> and receive a transferable ERC-20 bond token that accrues interest.</li>
+    <li><strong>Draw down</strong> — the issuer borrows raised capital with <code>sbn borrow</code>, leaving a reserve ratio in the market.</li>
+    <li><strong>Repay</strong> — <code>sbn repay</code> returns principal + interest; lenders exit with <code>sbn withdraw</code> / <code>sbn claim</code>.</li>
+    <li><strong>Close</strong> — <code>sbn close</code> settles the bond; the full history stays on-chain as the issuer's track record.</li>
+  </ol>
+
+  <h2>Command reference</h2>
+  <table>
+    <thead><tr><th>Command</th><th>What it does</th></tr></thead>
+    <tbody>
+      <tr><td><code>sbn raise &lt;usdc&gt; [--apr --type --term]</code></td><td>One shot: wallet → fund → register → deploy a bond</td></tr>
+      <tr><td><code>sbn deploy --cap &lt;usdc&gt; [flags]</code></td><td>Deploy a bond market with explicit terms</td></tr>
+      <tr><td><code>sbn deposit &lt;market&gt; &lt;usdc&gt;</code></td><td>Fund a bond (lender)</td></tr>
+      <tr><td><code>sbn borrow &lt;market&gt; &lt;usdc&gt;</code></td><td>Draw down raised capital (issuer)</td></tr>
+      <tr><td><code>sbn repay &lt;market&gt; &lt;usdc&gt;</code></td><td>Repay principal + interest</td></tr>
+      <tr><td><code>sbn withdraw &lt;market&gt; [usdc]</code> / <code>sbn claim</code></td><td>Redeem (lender)</td></tr>
+      <tr><td><code>sbn close &lt;market&gt;</code></td><td>Settle and close a bond</td></tr>
+      <tr><td><code>sbn status &lt;market&gt;</code> / <code>sbn list</code></td><td>Read live state</td></tr>
+      <tr><td><code>sbn wallet</code> / <code>sbn fund</code> / <code>sbn register</code></td><td>Manage the local wallet</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Architecture in one paragraph</h2>
+  <p>
+    Each bond is its own market contract (a fork of
+    <a href="https://github.com/wildcat-finance/v2-protocol" rel="noopener">Wildcat Protocol V2</a>)
+    holding a single asset, USDC. The CLI/SDK (<code>sellbonds</code> on npm) signs locally with a
+    key at <code>~/.sellbondsnow/wallet.json</code> and submits to Base; the website is a read-only
+    view of chain state. Contract addresses: <a href="/contracts.json">/contracts.json</a>. Machine
+    surfaces: <a href="/llms.txt">llms.txt</a>, <a href="/skill.md">skill.md</a>,
+    <a href="/.well-known/agent.json">agent.json</a>.
+  </p>
+
+  <h2>Guides</h2>
+  <ul>
+    <li><a href="/docs/how-can-an-ai-agent-raise-money">How can an AI agent raise money?</a></li>
+    <li><a href="/docs/how-do-onchain-bonds-work">How do uncollateralized on-chain bonds work?</a></li>
+    <li><a href="/docs/agent-bonds-vs-launching-a-token">Issuing a bond vs. launching a token</a></li>
+  </ul>
+
+  <p class="mt-12 border-t border-[var(--color-line)] pt-6 text-sm text-[var(--color-ink-muted)]">
+    Before using real funds, read the <a href="/risk">Risk Disclosure</a> — bonds are
+    uncollateralized and the contracts are an unaudited fork.
+  </p>
+</Prose>

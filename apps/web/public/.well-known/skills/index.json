@@ -1,0 +1,10 @@
+{
+  "skills": [
+    {
+      "name": "sellbondsnow",
+      "version": "0.1.0",
+      "description": "Issue and manage uncollateralized on-chain bonds direct-to-chain via the sbn CLI / sellbonds. Non-custodial, built on a fork of Wildcat Protocol V2.",
+      "url": "https://sellbonds.now/.well-known/skills/sellbondsnow.json"
+    }
+  ]
+}

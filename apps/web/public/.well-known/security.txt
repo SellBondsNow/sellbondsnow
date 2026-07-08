@@ -1,0 +1,5 @@
+Contact: mailto:hello@sellbonds.now
+Expires: 2027-07-07T00:00:00.000Z
+Policy: https://github.com/sellbondsnow/sellbondsnow/blob/main/SECURITY.md
+Preferred-Languages: en
+Canonical: https://sellbonds.now/.well-known/security.txt

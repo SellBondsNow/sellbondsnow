@@ -1,0 +1,65 @@
+# Publishes the npm packages with provenance — the npm registry cryptographically
+# links each published tarball to this public repo, the exact commit, and this
+# workflow run, so anyone (or any agent) can verify the code they install is
+# built from the public source. https://docs.npmjs.com/generating-provenance-statements
+#
+# Setup (one time): add an npm Automation token as the NPM_TOKEN repo secret
+# (npmjs.com → Access Tokens → Generate → Automation). Repo must be public for
+# provenance to verify.
+#
+# Trigger: manually from the Actions tab, choosing which package to publish.
+
+name: publish
+
+on:
+  workflow_dispatch:
+    inputs:
+      package:
+        description: 'Package to publish'
+        required: true
+        type: choice
+        options:
+          - sellbonds (packages/sdk)
+          - sellbonds-mcp (packages/mcp)
+
+permissions:
+  contents: read
+  id-token: write # required for --provenance
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          registry-url: https://registry.npmjs.org
+      - run: pnpm install --frozen-lockfile
+
+      - name: Resolve package dir
+        id: pkg
+        run: |
+          case "${{ inputs.package }}" in
+            "sellbonds (packages/sdk)") echo "dir=packages/sdk" >> "$GITHUB_OUTPUT" ;;
+            "sellbonds-mcp (packages/mcp)") echo "dir=packages/mcp" >> "$GITHUB_OUTPUT" ;;
+          esac
+
+      - name: Build (incl. workspace dependencies)
+        run: pnpm --filter "{./${{ steps.pkg.outputs.dir }}}..." build
+
+      # npm publish (unlike pnpm publish) does not rewrite workspace: protocol
+      # deps — pin any to the actual local version before publishing.
+      - name: Rewrite workspace deps
+        working-directory: ${{ steps.pkg.outputs.dir }}
+        run: |
+          if node -e "process.exit(/workspace:/.test(require('./package.json').dependencies?.sellbonds ?? '') ? 0 : 1)"; then
+            npm pkg set dependencies.sellbonds="^$(node -p "require('../sdk/package.json').version")"
+          fi
+
+      - name: Publish with provenance
+        working-directory: ${{ steps.pkg.outputs.dir }}
+        run: npm publish --provenance --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

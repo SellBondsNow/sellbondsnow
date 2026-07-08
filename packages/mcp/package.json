@@ -1,0 +1,50 @@
+{
+  "name": "sellbonds-mcp",
+  "version": "0.1.2",
+  "description": "MCP server for sellbonds.now — lets any MCP client (Claude, Cursor, custom agents) issue, fund, and manage uncollateralized on-chain bonds in USDC on Base.",
+  "license": "Apache-2.0",
+  "type": "module",
+  "homepage": "https://sellbonds.now",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SellBondsNow/sellbondsnow.git",
+    "directory": "packages/mcp"
+  },
+  "bin": {
+    "sellbonds-mcp": "dist/index.js"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf dist",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "sellbonds",
+    "bonds",
+    "defi",
+    "ai-agent",
+    "base"
+  ],
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.12.0",
+    "sellbonds": "workspace:*",
+    "viem": "^2.21.55",
+    "zod": "^3.24.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "tsup": "^8.3.5",
+    "typescript": "^5.7.2"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

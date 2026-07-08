@@ -1,0 +1,18 @@
+[profile.default]
+src = 'src'
+out = 'out'
+libs = ['lib']
+ffi = true
+fs_permissions = [
+    { access = "read", path = "./out"},
+    { access = "read", path = "./test/modules" },
+    { access = "read", path = "./test/fixtures/fs/read" },
+    { access = "read-write", path = "./test/fixtures/fs/write" },
+    { access = "read-write", path = "./test/fixtures/fe/output" }
+]
+
+[rpc_endpoints]
+mainnet = "https://mainnet.rpc.io"
+arbitrum = "https://arbitrum.rpc.io"
+
+# See more config options https://github.com/foundry-rs/foundry/tree/master/config

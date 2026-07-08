@@ -1,0 +1,91 @@
+---
+import Base from './Base.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+
+interface Props {
+  title: string;
+  description: string;
+  /** Small uppercase kicker above the h1, e.g. "Legal" or "Docs". */
+  kicker?: string;
+  heading: string;
+  /** Optional markdown alternate served from /public for agents. */
+  mdAlternate?: string;
+}
+
+const { title, description, kicker, heading, mdAlternate } = Astro.props;
+---
+
+<Base title={title} description={description}>
+  <Header />
+  <main>
+    <article class="mx-auto max-w-3xl px-6 py-16 md:py-20">
+      {kicker && (
+        <p class="text-xs font-bold uppercase tracking-widest text-[var(--color-ink-muted)]">{kicker}</p>
+      )}
+      <h1 class="mt-3 text-balance text-4xl font-bold tracking-tight text-[var(--color-ink)] md:text-5xl">
+        {heading}
+      </h1>
+      {mdAlternate && (
+        <p class="mt-3 font-mono text-xs text-[var(--color-ink-muted)]">
+          Agent-readable version: <a href={mdAlternate} class="underline underline-offset-2 hover:text-[var(--color-ink)]">{mdAlternate}</a>
+        </p>
+      )}
+      <div class="prose-sbn mt-10">
+        <slot />
+      </div>
+    </article>
+  </main>
+  <Footer />
+</Base>
+
+<style is:global>
+  /* Minimal typographic defaults for long-form pages, matching the site system. */
+  .prose-sbn {
+    color: var(--color-ink-soft);
+    font-size: 1.0625rem;
+    line-height: 1.75;
+  }
+  .prose-sbn h2 {
+    margin-top: 3rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--color-line);
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--color-ink);
+  }
+  .prose-sbn h3 {
+    margin-top: 2rem;
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: var(--color-ink);
+  }
+  .prose-sbn p { margin-top: 1rem; }
+  .prose-sbn ul { margin-top: 1rem; padding-left: 1.25rem; list-style: disc; }
+  .prose-sbn ol { margin-top: 1rem; padding-left: 1.25rem; list-style: decimal; }
+  .prose-sbn li { margin-top: 0.5rem; }
+  .prose-sbn a { text-decoration: underline; text-underline-offset: 2px; }
+  .prose-sbn a:hover { color: var(--color-ink); }
+  .prose-sbn strong { font-weight: 600; color: var(--color-ink); }
+  .prose-sbn code {
+    font-family: var(--font-mono);
+    font-size: 0.9em;
+    background: var(--color-paper-mute);
+    padding: 0.125rem 0.375rem;
+  }
+  .prose-sbn pre {
+    margin-top: 1rem;
+    overflow-x: auto;
+    background: var(--color-ink);
+    color: var(--color-paper);
+    padding: 1rem 1.25rem;
+    font-family: var(--font-mono);
+    font-size: 0.875rem;
+    line-height: 1.6;
+  }
+  .prose-sbn pre code { background: none; padding: 0; color: inherit; }
+  .prose-sbn table { margin-top: 1rem; width: 100%; border-collapse: collapse; font-size: 0.9375rem; }
+  .prose-sbn th { text-align: left; font-weight: 600; color: var(--color-ink); border-bottom: 1px solid var(--color-ink); padding: 0.5rem 0.75rem 0.5rem 0; }
+  .prose-sbn td { border-bottom: 1px solid var(--color-line); padding: 0.5rem 0.75rem 0.5rem 0; vertical-align: top; }
+</style>

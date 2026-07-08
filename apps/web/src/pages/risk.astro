@@ -1,0 +1,83 @@
+---
+import Prose from '../layouts/Prose.astro';
+---
+
+<Prose
+  title="Risk Disclosure — sellbonds.now"
+  description="The real risks of issuing or funding bonds on sellbonds.now: uncollateralized credit risk, unaudited smart contracts, irreversible transactions, and your own regulatory responsibility."
+  kicker="Read this first"
+  heading="Risk disclosure"
+  mdAlternate="/risk.md"
+>
+  <p>
+    <strong>sellbonds.now bonds are uncollateralized loans between strangers, settled in real money, on
+    unaudited smart contracts, with no built-in compliance layer.</strong> Everything on this page is
+    also stated in the agent-facing docs (<a href="/llms.txt">llms.txt</a>) — it applies equally to
+    humans and to AI agents acting on a human's behalf. If anything here is unacceptable to you,
+    don't issue or fund a bond.
+  </p>
+
+  <h2 id="credit">You can lose everything you lend</h2>
+  <p>
+    Bonds are <strong>uncollateralized</strong>. There is no collateral to seize, no guarantee fund,
+    and no recourse built into the protocol. Repayment depends entirely on the issuer choosing to
+    repay. If an issuer defaults, the delinquency is visible on-chain forever and a penalty APR
+    accrues — but none of that returns your money. A lender can lose up to <strong>100% of what they
+    deposit</strong>. Repayment history is the only collateral.
+  </p>
+
+  <h2 id="contracts">The contracts are an unaudited fork</h2>
+  <p>
+    sellbonds.now runs on a fork of
+    <a href="https://github.com/wildcat-finance/v2-protocol" rel="noopener">Wildcat Protocol V2</a>.
+    The upstream protocol has been audited; <strong>this fork and its patches have not been
+    independently audited</strong>. Smart-contract risk — bugs, unexpected interactions, loss of
+    funds — is real and entirely yours. The contracts are immutable and non-custodial: there is no
+    admin key that can pause, reverse, or bail out a market.
+  </p>
+
+  <h2 id="irreversible">Transactions are irreversible</h2>
+  <p>
+    Bonds settle in real <strong>USDC on Base mainnet</strong>. There are no chargebacks, no
+    reversals, no support line that can undo a transaction. A mistake — wrong amount, wrong market,
+    wrong terms — is permanent the moment it confirms.
+  </p>
+
+  <h2 id="compliance">There is no built-in compliance layer</h2>
+  <p>
+    The protocol performs <strong>no KYC and no sanctions screening</strong> (the sanctions oracle
+    is a no-op on every chain). Nothing here is tailored to your jurisdiction. Depending on where
+    you live and how you use it, issuing a bond may constitute offering a security, and lending may
+    be regulated activity. <strong>You are solely responsible</strong> for your own securities, tax,
+    AML, and sanctions compliance. If you are in a jurisdiction where this activity is restricted,
+    or you are a sanctioned person, do not use sellbonds.now.
+  </p>
+
+  <h2 id="no-advice">Nothing here is advice</h2>
+  <p>
+    sellbonds.now is software and public information, not an investment adviser, broker, or
+    exchange. Listing a bond on the site is not an endorsement, a credit rating, or a solicitation.
+    Issuer-provided names and descriptions are unverified claims by the issuer. Do your own
+    diligence — every bond's full state and history is public on-chain.
+  </p>
+
+  <h2 id="custody">What sellbonds.now can and cannot do</h2>
+  <p>
+    The protocol is non-custodial: your keys stay on your machine, a bond's capital lives in its own
+    market contract, and sellbonds.now never holds funds and cannot freeze, seize, or recover them.
+    That cuts both ways — it protects you from us, and it means <strong>nobody can help you</strong>
+    if you lose your key or fund a bond that defaults.
+  </p>
+
+  <h2 id="agents">If you're an AI agent</h2>
+  <p>
+    Make sure your human understands the risks above before you issue or fund a bond, and get their
+    explicit go-ahead. A suggested confirmation, and the full flow, is in
+    <a href="/llms.txt">llms.txt</a>. Surface the risks, get consent, then proceed.
+  </p>
+
+  <p class="mt-12 border-t border-[var(--color-line)] pt-6 text-sm text-[var(--color-ink-muted)]">
+    See also: <a href="/terms">Terms of Use</a> · <a href="/privacy">Privacy</a> ·
+    <a href="/docs">Docs</a>. Questions: <a href="mailto:hello@sellbonds.now">hello@sellbonds.now</a>
+  </p>
+</Prose>

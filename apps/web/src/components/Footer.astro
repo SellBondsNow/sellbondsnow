@@ -1,0 +1,79 @@
+---
+const year = new Date().getFullYear();
+
+const sections = [
+  {
+    title: 'Product',
+    links: [
+      { label: 'Docs', href: '/docs' },
+      { label: 'Pricing', href: '/pricing' },
+      { label: 'Status', href: '/status' },
+      { label: 'Contracts', href: '/contracts.json' },
+    ],
+  },
+  {
+    title: 'For agents',
+    links: [
+      { label: 'llms.txt', href: '/llms.txt' },
+      { label: 'skill.md', href: '/skill.md' },
+      { label: 'agent.json', href: '/.well-known/agent.json' },
+    ],
+  },
+  {
+    title: 'Resources',
+    links: [
+      { label: 'GitHub', href: 'https://github.com/sellbondsnow/sellbondsnow' },
+      { label: 'Verify (open source)', href: '/verify' },
+      { label: 'Skill repo', href: 'https://github.com/sellbondsnow/skill' },
+      { label: 'Twitter / X', href: 'https://x.com/sellbondsnow' },
+      { label: 'Press kit', href: '/press' },
+      { label: 'hello@sellbonds.now', href: 'mailto:hello@sellbonds.now' },
+    ],
+  },
+  {
+    title: 'Legal',
+    links: [
+      { label: 'Risk disclosure', href: '/risk' },
+      { label: 'Terms', href: '/terms' },
+      { label: 'Privacy', href: '/privacy' },
+    ],
+  },
+];
+---
+
+<footer class="bg-[var(--color-paper-soft)]">
+  <div class="mx-auto max-w-6xl px-6 py-16">
+    <div class="grid gap-10 md:grid-cols-5 md:gap-8">
+      <div class="md:col-span-1">
+        <div class="font-mono text-base font-semibold tracking-tight text-[var(--color-ink)]">sellbonds.now</div>
+        <p class="mt-3 text-xs leading-relaxed text-[var(--color-ink-muted)]">
+          On-chain bonds for AI agents.
+        </p>
+      </div>
+
+      {sections.map((section) => (
+        <div>
+          <div class="mb-4 text-xs font-semibold uppercase tracking-widest text-[var(--color-ink-muted)]">{section.title}</div>
+          <ul class="space-y-2.5">
+            {section.links.map((link) => (
+              <li>
+                <a href={link.href} class="text-sm text-[var(--color-ink-soft)] hover:text-[var(--color-ink)]">
+                  {link.label}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))}
+    </div>
+
+    <div class="mt-16 flex flex-col items-start justify-between gap-4 border-t border-[var(--color-line)] pt-8 md:flex-row md:items-center">
+      <div class="text-xs text-[var(--color-ink-muted)]">
+        &copy; {year} sellbonds.now
+      </div>
+      <div class="font-mono text-xs text-[var(--color-ink-muted)]">
+        Built for agents.
+      </div>
+    </div>
+  </div>
+</footer>

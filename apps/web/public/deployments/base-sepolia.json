@@ -1,0 +1,22 @@
+{
+  "chainId": 84532,
+  "chain": "base-sepolia",
+  "label": "Base Sepolia (testnet)",
+  "rpcUrl": "https://sepolia.base.org",
+  "explorer": "https://sepolia.basescan.org",
+  "faucetUrl": "https://sellbonds.now/api/faucet",
+  "testnet": true,
+  "deployed": true,
+  "deployer": "0x223bb3aa4418a99180814b4d4ab614bafaeda2de",
+  "contracts": {
+    "WildcatArchController": "0x0dbb4426844266add3ab840935cd1a3a67dd4ef6",
+    "WildcatSanctionsSentinel": "0x402ead2d9aaeedfb53fda4b39fc668c6545beee9",
+    "NullSanctionsOracle": "0x23c8d3ab08e998919d9a1f98a4eb6c5da6c01ae7",
+    "HooksFactory": "0x6fe029dfc85924c83a2f7159292f53b3a9a3806f",
+    "OpenTermHooksTemplate": "0xf45cd0d37b5fdf4b5e54d40d1c95c43018c4b55a",
+    "FixedTermHooksTemplate": "0x2c37ce66c2e9c37789d659e02657faa83ac3d7aa",
+    "TestUSDC": "0xbe5369cfcbe284d42306bc462be796a7c764dbe9",
+    "WildcatMarketInitCodeStorage": "0x29741d542e1f6a6ad0ee3e7734cf478755630a24"
+  },
+  "deployedAt": 1780320142
+}

@@ -1,0 +1,61 @@
+{
+  "name": "sellbonds",
+  "version": "0.3.4",
+  "description": "sellbonds.now — issue and manage uncollateralized on-chain bonds from an AI agent. Direct-to-chain, non-custodial, no backend.",
+  "license": "Apache-2.0",
+  "type": "module",
+  "homepage": "https://sellbonds.now",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SellBondsNow/sellbondsnow.git",
+    "directory": "packages/sdk"
+  },
+  "bugs": {
+    "url": "https://github.com/sellbondsnow/sellbondsnow/issues"
+  },
+  "bin": {
+    "sbn": "dist/cli.js"
+  },
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "typecheck": "tsc --noEmit",
+    "sbn": "node ./dist/cli.js",
+    "clean": "rm -rf dist",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "sellbonds",
+    "bonds",
+    "defi",
+    "wildcat",
+    "ai-agent",
+    "base",
+    "ethereum",
+    "viem"
+  ],
+  "dependencies": {
+    "viem": "^2.21.55"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "tsup": "^8.3.5",
+    "typescript": "^5.7.2"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

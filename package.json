@@ -1,0 +1,30 @@
+{
+  "name": "sellbondsnow",
+  "version": "0.0.1",
+  "private": true,
+  "license": "Apache-2.0",
+  "description": "sellbonds.now — instant on-chain bond issuance for AI agents",
+  "scripts": {
+    "dev": "turbo run dev",
+    "dev:web": "pnpm --filter @sbn/web dev",
+    "build": "turbo run build",
+    "build:web": "pnpm --filter @sbn/web build",
+    "typecheck": "turbo run typecheck",
+    "lint": "turbo run lint",
+    "clean": "turbo run clean"
+  },
+  "dependencies": {
+    "@resvg/resvg-js": "^2.6.2",
+    "viem": "^2.21.55"
+  },
+  "devDependencies": {
+    "@vercel/node": "^5.0.0",
+    "tsx": "^4.23.0",
+    "turbo": "^2.3.0",
+    "typescript": "^5.7.0"
+  },
+  "packageManager": "pnpm@10.2.1",
+  "engines": {
+    "node": ">=22"
+  }
+}

@@ -1,0 +1,179 @@
+---
+import Base from '../layouts/Base.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+
+// Full-page view of a single bond. Client-rendered from /api/bond?market=0x… so it
+// works for any bond (incl. ones issued after the last build) with no rebuild.
+// Path-style URLs (/bond/0x…) are served by api/bond-page.ts, which injects
+// bond-specific meta tags + a server-rendered summary into this same shell — keep
+// the [data-bond] container EMPTY here so that injection has a stable anchor.
+---
+
+<Base title="Bond — sellbonds.now" description="A bond issued on sellbonds.now — terms, issuer, and on-chain investments and repayments.">
+  <Header current="bonds" />
+  <main>
+    <section>
+      <div class="mx-auto max-w-4xl px-6 py-16 md:py-20">
+        <a href="/#bonds-live" class="group inline-flex items-center gap-1.5 text-sm text-[var(--color-ink-muted)] transition-colors hover:text-[var(--color-ink)]">
+          <span aria-hidden="true" class="transition-transform group-hover:-translate-x-0.5">←</span> All bonds
+        </a>
+        <div data-bond class="mt-8"></div>
+      </div>
+    </section>
+  </main>
+  <Footer />
+</Base>
+
+<script>
+  const root = document.querySelector<HTMLElement>('[data-bond]');
+  const market = new URLSearchParams(location.search).get('market') || location.pathname.split('/').filter(Boolean).pop() || '';
+
+  const esc = (s: string) =>
+    String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]!));
+  const shortAddr = (a: string) => (a && a.length > 12 ? `${a.slice(0, 6)}…${a.slice(-4)}` : a || '—');
+  const usd = (n: number) => {
+    const v = Number(n) || 0;
+    if (v >= 1_000_000) return '$' + (v / 1_000_000).toFixed(v % 1_000_000 === 0 ? 0 : 1) + 'M';
+    const cents = Math.round(v * 100) / 100;
+    const d = Number.isInteger(cents) ? 0 : 2;
+    return '$' + cents.toLocaleString('en-US', { minimumFractionDigits: d, maximumFractionDigits: d });
+  };
+  const apr = (n: number) => (Number.isFinite(n) ? `${(+n).toFixed(n % 1 === 0 ? 0 : 1)}%` : '—');
+  const fmtDate = (ts?: number) => {
+    if (!ts) return '';
+    try { return new Date(ts * 1000).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }); } catch { return ''; }
+  };
+  const ago = (ts: number) => {
+    const s = Math.max(0, Math.floor(Date.now() / 1000 - ts));
+    if (s < 60) return `${s}s ago`;
+    if (s < 3600) return `${Math.floor(s / 60)}m ago`;
+    if (s < 86400) return `${Math.floor(s / 3600)}h ago`;
+    return `${Math.floor(s / 86400)}d ago`;
+  };
+
+  function stat(label: string, value: string, sub = '') {
+    return `<div class="border-t border-[var(--color-line)] pt-3">
+      <dt class="text-[11px] font-bold uppercase tracking-widest text-[var(--color-ink-muted)]">${label}</dt>
+      <dd class="mt-1 font-mono text-lg tabular-nums text-[var(--color-ink)]">${value}${sub ? ` <span class="text-sm text-[var(--color-ink-muted)]">${sub}</span>` : ''}</dd>
+    </div>`;
+  }
+
+  function eventRow(e: any) {
+    const verb = { issued: 'Issued', invested: 'Invested', drawn: 'Drawn', repaid: 'Repaid' }[e.type] || e.type;
+    const moneyIn = e.type === 'invested' || e.type === 'issued';
+    const dot = moneyIn ? 'bg-[var(--color-accent)]' : 'border border-[var(--color-ink-muted)]';
+    const amt = e.amountUsdc != null ? `<span class="font-mono tabular-nums text-[var(--color-ink)]">${usd(e.amountUsdc)}</span>` : '<span class="text-[var(--color-ink-muted)]">—</span>';
+    const who = e.actor ? `<span class="font-mono text-xs text-[var(--color-ink-muted)]">${esc(shortAddr(e.actor))}</span>` : '';
+    return `<div class="grid grid-cols-2 items-center gap-x-4 gap-y-1 border-t border-[var(--color-line)] py-3 md:grid-cols-[120px_1fr_1fr_auto]">
+      <div class="flex items-center gap-2"><span class="h-1.5 w-1.5 flex-shrink-0 rounded-full ${dot}"></span><span class="font-mono text-[11px] uppercase tracking-wide text-[var(--color-ink-muted)]">${verb}</span></div>
+      <div class="text-right md:text-left">${amt}</div>
+      <div class="hidden md:block">${who}</div>
+      <a href="${esc(e.explorerUrl)}" target="_blank" rel="noopener" class="col-span-2 text-right font-mono text-[11px] text-[var(--color-ink-muted)] hover:text-[var(--color-ink)] md:col-span-1">${ago(e.at)} ↗</a>
+    </div>`;
+  }
+
+  function render(b: any) {
+    const title = b.label || b.name || b.symbol || 'Untitled bond';
+    document.title = `${title} — sellbonds.now`;
+    const open = b.status === 'open';
+    const pct = Math.max(0, Math.min(100, Math.round(b.filledPct || 0)));
+    const investText =
+      `Invest in the ${title} bond (${b.market}) on sellbonds.now — look up what I need to do to invest from https://sellbonds.now/llms.txt and invest with USDC.`;
+
+    const events = (b.events || []) as any[];
+    const invested = events.filter((e) => e.type === 'invested');
+    const eventsHtml = events.length
+      ? events.map(eventRow).join('')
+      : `<div class="border-t border-[var(--color-line)] py-4 text-sm text-[var(--color-ink-muted)]">No on-chain activity yet.</div>`;
+
+    root!.innerHTML = `
+      <p class="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-[var(--color-ink-muted)]">
+        <span class="h-2 w-2 rounded-full ${open ? 'bg-[var(--color-accent)]' : 'border border-[var(--color-ink-muted)]'}"></span>
+        ${open ? 'Open' : 'Closed'} · Base mainnet
+      </p>
+      <h1 class="mt-3 text-balance text-4xl font-bold tracking-tight text-[var(--color-ink)] md:text-5xl">${esc(title)}</h1>
+      <p class="mt-2 font-mono text-sm text-[var(--color-ink-muted)]">${esc(b.symbol || '')}${b.issuedAt ? ` · issued ${fmtDate(b.issuedAt)}` : ''}</p>
+      ${b.description ? `<p class="mt-4 max-w-2xl text-lg leading-relaxed text-[var(--color-ink-soft)]">${esc(b.description)}</p>` : ''}
+
+      <dl class="mt-10 grid grid-cols-2 gap-x-8 gap-y-5 md:grid-cols-4">
+        ${stat('Interest rate', apr(b.aprPct), 'APR')}
+        ${stat('Raised', usd(b.raisedUsdc), `/ ${usd(b.capacityUsdc)} cap`)}
+        ${stat('In market', usd(b.inMarketUsdc))}
+        ${stat('Drawn down', usd(b.drawnDownUsdc))}
+        ${stat('Available to lend', usd(Math.max(0, b.capacityUsdc - b.raisedUsdc)))}
+        ${stat('Borrowable now', usd(b.borrowableUsdc))}
+        ${stat('Reserve', apr(b.reservePct))}
+        ${stat('Penalty APR', apr(b.penaltyAprPct))}
+      </dl>
+
+      <div class="mt-5 h-1 w-full bg-[var(--color-line)]"><div class="h-full bg-[var(--color-accent)]" style="width:${pct}%"></div></div>
+      <p class="mt-2 font-mono text-xs text-[var(--color-ink-muted)]">${pct}% of cap raised</p>
+
+      <div class="mt-10 grid grid-cols-1 gap-4 border-t border-[var(--color-ink)] pt-6 md:grid-cols-2">
+        <div>
+          <p class="text-[11px] font-bold uppercase tracking-widest text-[var(--color-ink-muted)]">Contract</p>
+          <a href="${esc(b.explorerUrl)}" target="_blank" rel="noopener" class="mt-1 inline-flex items-center gap-1 break-all font-mono text-sm text-[var(--color-ink-soft)] hover:text-[var(--color-ink)] hover:underline">${esc(b.market)} ↗</a>
+        </div>
+        <div>
+          <p class="text-[11px] font-bold uppercase tracking-widest text-[var(--color-ink-muted)]">Issuer</p>
+          <a href="${esc(b.issuerExplorerUrl)}" target="_blank" rel="noopener" class="mt-1 inline-flex items-center gap-1 break-all font-mono text-sm text-[var(--color-ink-soft)] hover:text-[var(--color-ink)] hover:underline">${esc(b.issuer)} ↗</a>
+        </div>
+      </div>
+
+      <div class="mt-8">
+        <button type="button" data-invest class="inline-flex items-center gap-2 bg-[var(--color-ink)] px-5 py-3.5 text-sm font-semibold text-[var(--color-paper)] transition-opacity hover:opacity-85">
+          <span data-invest-label>Copy instructions for my agent to invest</span>
+          <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        </button>
+      </div>
+
+      <div class="mt-12">
+        <div class="flex items-baseline justify-between">
+          <h2 class="text-xs font-bold uppercase tracking-widest text-[var(--color-ink-muted)]">Activity</h2>
+          <span class="font-mono text-xs text-[var(--color-ink-muted)]">${invested.length} investment${invested.length === 1 ? '' : 's'}</span>
+        </div>
+        <div class="mt-4 border-b border-[var(--color-line)]">${eventsHtml}</div>
+      </div>`;
+
+    const btn = root!.querySelector<HTMLButtonElement>('[data-invest]');
+    btn?.addEventListener('click', async () => {
+      try { await navigator.clipboard.writeText(investText); } catch {
+        const ta = document.createElement('textarea'); ta.value = investText; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove();
+      }
+      const label = btn.querySelector('[data-invest-label]');
+      if (label) { const prev = label.textContent; label.textContent = 'Copied — paste it into your agent'; setTimeout(() => { label.textContent = prev; }, 2200); }
+    });
+  }
+
+  async function load() {
+    if (!root) return;
+    if (!market || !/^0x[0-9a-fA-F]{40}$/.test(market)) {
+      root.innerHTML = `<p class="text-[var(--color-ink-soft)]">No bond specified. <a href="/#bonds-live" class="underline underline-offset-2 hover:text-[var(--color-ink)]">Browse all bonds →</a></p>`;
+      return;
+    }
+    try {
+      const res = await fetch(`/api/bond?market=${market}`, { headers: { accept: 'application/json' } });
+      if (res.status === 404) {
+        root.innerHTML = `<p class="text-[var(--color-ink-soft)]">No sellbonds bond found at <span class="font-mono text-sm">${esc(market)}</span>. <a href="/#bonds-live" class="underline underline-offset-2 hover:text-[var(--color-ink)]">Browse all bonds →</a></p>`;
+        return;
+      }
+      if (!res.ok) throw new Error(String(res.status));
+      render(await res.json());
+    } catch {
+      root.innerHTML = `<p class="text-[var(--color-ink-soft)]">Couldn't load this bond right now. <a href="/api/bond?market=${esc(market)}" class="underline underline-offset-2 hover:text-[var(--color-ink)]">Raw data ↗</a></p>`;
+    }
+  }
+
+  // Skeleton only when the server didn't inject a summary (query-param style URLs).
+  if (root && root.childElementCount === 0) {
+    root.innerHTML = `
+      <div class="h-5 w-40 bg-[var(--color-paper-mute)] motion-safe:animate-pulse"></div>
+      <div class="mt-4 h-12 w-3/4 bg-[var(--color-paper-mute)] motion-safe:animate-pulse"></div>
+      <div class="mt-8 h-24 w-full bg-[var(--color-paper-mute)] motion-safe:animate-pulse"></div>`;
+  }
+
+  load();
+  // Refresh live state every 30s while the page is open.
+  setInterval(load, 30_000);
+</script>

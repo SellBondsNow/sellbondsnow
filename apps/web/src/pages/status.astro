@@ -1,0 +1,76 @@
+---
+import Prose from '../layouts/Prose.astro';
+---
+
+<Prose
+  title="Status — sellbonds.now"
+  description="Live status of sellbonds.now: the on-chain protocol, public API endpoints, and network aggregates read directly from Base mainnet."
+  kicker="Status"
+  heading="Everything runs on-chain"
+>
+  <p>
+    There is no application server in the transaction path — bonds live in immutable contracts on
+    Base, so <strong>the protocol is up whenever Base is up</strong>. What can degrade is this
+    website and its convenience read APIs. Live numbers below are read from chain right now.
+  </p>
+
+  <h2>Network</h2>
+  <dl data-status-aggregates class="mt-4 grid grid-cols-2 gap-x-8 gap-y-5 md:grid-cols-4">
+    <div class="border-t border-[var(--color-line)] pt-3">
+      <dt class="text-[11px] font-bold uppercase tracking-widest text-[var(--color-ink-muted)]">Bonds issued</dt>
+      <dd data-agg="totalBonds" class="mt-1 font-mono text-lg tabular-nums text-[var(--color-ink)]">—</dd>
+    </div>
+    <div class="border-t border-[var(--color-line)] pt-3">
+      <dt class="text-[11px] font-bold uppercase tracking-widest text-[var(--color-ink-muted)]">Active</dt>
+      <dd data-agg="activeBonds" class="mt-1 font-mono text-lg tabular-nums text-[var(--color-ink)]">—</dd>
+    </div>
+    <div class="border-t border-[var(--color-line)] pt-3">
+      <dt class="text-[11px] font-bold uppercase tracking-widest text-[var(--color-ink-muted)]">Issuers</dt>
+      <dd data-agg="totalIssuers" class="mt-1 font-mono text-lg tabular-nums text-[var(--color-ink)]">—</dd>
+    </div>
+    <div class="border-t border-[var(--color-line)] pt-3">
+      <dt class="text-[11px] font-bold uppercase tracking-widest text-[var(--color-ink-muted)]">Raised (USDC)</dt>
+      <dd data-agg="totalRaisedUsdc" class="mt-1 font-mono text-lg tabular-nums text-[var(--color-ink)]">—</dd>
+    </div>
+  </dl>
+  <p data-status-note class="mt-3 font-mono text-xs text-[var(--color-ink-muted)]">reading chain…</p>
+
+  <h2>Surfaces</h2>
+  <table>
+    <thead><tr><th>Surface</th><th>What it is</th><th>Check</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Protocol (Base mainnet)</strong></td><td>The bond contracts — immutable, non-custodial</td><td><a href="https://status.base.org" rel="noopener">status.base.org</a></td></tr>
+      <tr><td><code>/api/markets</code></td><td>Issued-bonds index (read-only convenience)</td><td><a href="/api/markets">live JSON</a></td></tr>
+      <tr><td><code>/api/activity</code></td><td>Recent on-chain events feed</td><td><a href="/api/activity">live JSON</a></td></tr>
+      <tr><td><code>/rpc</code></td><td>Optional hosted Base RPC proxy</td><td>POST JSON-RPC</td></tr>
+      <tr><td>Testnet dispenser</td><td>Base Sepolia gas for new agent wallets</td><td><code>POST /api/faucet</code></td></tr>
+    </tbody>
+  </table>
+  <p>
+    If an API here is down, agents can bypass it entirely: read state from any Base RPC and keep
+    transacting — see <a href="/llms.txt">llms.txt</a> for the direct-to-chain flow.
+  </p>
+</Prose>
+
+<script>
+  const fmt = (k: string, v: number) =>
+    k === 'totalRaisedUsdc' ? '$' + Number(v).toLocaleString('en-US', { maximumFractionDigits: 2 }) : String(v);
+  fetch('/api/markets')
+    .then((r) => {
+      if (!r.ok) throw new Error(String(r.status));
+      return r.json();
+    })
+    .then((j) => {
+      for (const el of document.querySelectorAll<HTMLElement>('[data-agg]')) {
+        const k = el.dataset.agg!;
+        if (j.aggregates && j.aggregates[k] != null) el.textContent = fmt(k, j.aggregates[k]);
+      }
+      const note = document.querySelector('[data-status-note]');
+      if (note) note.textContent = `live from Base mainnet · updated ${new Date(j.updatedAt).toLocaleTimeString()}`;
+    })
+    .catch(() => {
+      const note = document.querySelector('[data-status-note]');
+      if (note)
+        note.textContent = 'read API unreachable — the protocol itself is unaffected; read state from any Base RPC.';
+    });
+</script>

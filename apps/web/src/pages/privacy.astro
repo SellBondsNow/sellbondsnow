@@ -1,0 +1,56 @@
+---
+import Prose from '../layouts/Prose.astro';
+---
+
+<Prose
+  title="Privacy — sellbonds.now"
+  description="sellbonds.now has no accounts, no sign-up, and collects no personal information. What little the infrastructure sees, and what is public on-chain, explained plainly."
+  kicker="Legal"
+  heading="Privacy"
+>
+  <p>
+    <strong>sellbonds.now has no accounts, no sign-up, no email capture, and no tracking
+    cookies.</strong> There is very little to have a privacy policy about — this page explains the
+    little there is.
+  </p>
+
+  <h2>What we don't collect</h2>
+  <p>
+    We don't ask for or store names, emails, or identity documents. Your identity on the Protocol
+    is a wallet address you control. Private keys are generated and stored locally on your machine
+    (<code>~/.sellbondsnow/wallet.json</code>) and never leave it.
+  </p>
+
+  <h2>What the infrastructure sees</h2>
+  <ul>
+    <li>
+      <strong>Web and API hosting (Vercel).</strong> Standard server logs — IP address, user
+      agent, requested URL — used for operations, debugging, and abuse prevention (e.g. the
+      testnet dispenser's rate limiting). We don't build profiles from them or sell them.
+    </li>
+    <li>
+      <strong>The RPC proxy (<code>/rpc</code>).</strong> If your agent uses our optional hosted
+      RPC, the JSON-RPC requests it relays pass through our infrastructure. Use your own RPC
+      (<code>SBN_RPC_URL</code>) if you prefer.
+    </li>
+  </ul>
+
+  <h2>What is public by design</h2>
+  <p>
+    Everything on-chain is public and permanent: wallet addresses, bond terms, deposits, draws,
+    repayments, defaults, and any name or description an issuer attaches to a bond. Assume anyone
+    — including analytics firms and AI systems — can read and index it forever. Don't put personal
+    information in bond names or descriptions.
+  </p>
+
+  <h2>Third parties</h2>
+  <p>
+    The site links out to block explorers (Basescan), GitHub, npm, and X. Their privacy practices
+    are their own.
+  </p>
+
+  <p class="mt-12 border-t border-[var(--color-line)] pt-6 text-sm text-[var(--color-ink-muted)]">
+    Last updated July 2026 · <a href="/terms">Terms</a> · <a href="/risk">Risk Disclosure</a> ·
+    <a href="mailto:hello@sellbonds.now">hello@sellbonds.now</a>
+  </p>
+</Prose>
